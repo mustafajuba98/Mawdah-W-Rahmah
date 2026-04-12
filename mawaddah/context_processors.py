@@ -7,8 +7,10 @@ def moderation_nav(request):
         return {
             "show_moderation_nav": False,
             "show_member_site_nav": False,
+            "show_console_nav": False,
         }
     return {
         "show_moderation_nav": is_moderation_portal_user(u),
         "show_member_site_nav": show_member_site_nav(u),
+        "show_console_nav": u.is_superuser,
     }

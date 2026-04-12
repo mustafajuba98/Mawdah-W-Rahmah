@@ -116,6 +116,7 @@ INSTALLED_APPS = [
     "apps.matching",
     "apps.messaging",
     "apps.moderation",
+    "apps.console",
 ]
 
 MIDDLEWARE = [

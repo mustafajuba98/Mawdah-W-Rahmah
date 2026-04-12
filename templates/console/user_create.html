@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}مستخدم جديد{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>إنشاء مستخدم</h1>
+  <p class="muted">يُنشأ حساب مع ملف مقدّم تجريبي جاهز للتصفح بعد ضبط الحالة على «مفعّل».</p>
+  <form method="post" class="console-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">إنشاء</button>
+    <a class="btn btn-ghost" href="{% url 'console_user_list' %}">إلغاء</a>
+  </form>
+</div>
+{% endblock %}

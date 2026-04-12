@@ -353,3 +353,74 @@ ul.errorlist li { background: #ffebee; padding: 0.4rem 0.55rem; margin: 0.2rem 0
   .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; }
   .sidebar .nav-section { width: 100%; }
 }
+
+/* ——— لوحة تحكم السوبر يوزر ——— */
+.console-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.stat-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+.stat-card .stat-num {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.2;
+}
+.stat-card .stat-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+  display: block;
+}
+ul.status-breakdown {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+ul.status-breakdown li {
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+table.data-table th,
+table.data-table td {
+  padding: 0.65rem 0.85rem;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+table.data-table th {
+  background: var(--primary-soft);
+  font-weight: 700;
+  color: var(--primary);
+}
+table.data-table tr:last-child td { border-bottom: none; }
+table.data-table tbody tr:hover { background: #fafcfb; }
+
+.console-form ul:not(.messages):not(.errorlist) {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+.console-form ul li { margin: 0.35rem 0; }
+.console-form ul li label { display: inline; font-weight: 500; margin-right: 0.35rem; }

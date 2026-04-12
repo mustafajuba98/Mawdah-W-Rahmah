@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}المستخدمون — لوحة التحكم{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>المستخدمون</h1>
+  <p class="muted">بحث بالبريد أو الاسم الظاهر في الملف.</p>
+  <form method="get" class="filter-grid" style="margin-bottom:1rem;">
+    <div>
+      <label for="q">بحث</label>
+      <input type="search" id="q" name="q" value="{{ request.GET.q }}" placeholder="بريد أو اسم">
+    </div>
+    <div>
+      <label for="status">حالة الحساب</label>
+      <select id="status" name="status">
+        <option value="">الكل</option>
+        <option value="registered" {% if request.GET.status == "registered" %}selected{% endif %}>مسجّل</option>
+        <option value="pending_review" {% if request.GET.status == "pending_review" %}selected{% endif %}>قيد المراجعة</option>
+        <option value="active" {% if request.GET.status == "active" %}selected{% endif %}>مفعّل</option>
+        <option value="rejected" {% if request.GET.status == "rejected" %}selected{% endif %}>مرفوض</option>
+        <option value="suspended" {% if request.GET.status == "suspended" %}selected{% endif %}>موقوف</option>
+      </select>
+    </div>
+    <div class="filter-actions">
+      <button type="submit" class="btn" style="margin:0;">تصفية</button>
+      <a href="{% url 'console_user_list' %}" class="btn btn-ghost" style="margin:0;">إعادة ضبط</a>
+      <a href="{% url 'console_user_create' %}" class="btn btn-secondary" style="margin:0;">مستخدم جديد</a>
+    </div>
+  </form>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>البريد</th>
+          <th>الاسم</th>
+          <th>الحالة</th>
+          <th>النوع</th>
+          <th>أدوار</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.email }}{% if u.is_superuser %} <span class="badge">سوبر</span>{% endif %}</td>
+          <td>{% if u.applicant_profile %}{{ u.applicant_profile.full_name }}{% else %}—{% endif %}</td>
+          <td>{{ u.get_profile_status_display }}</td>
+          <td>{% if u.applicant_gender %}{{ u.get_applicant_gender_display }}{% else %}—{% endif %}</td>
+          <td class="muted" style="font-size:0.85rem;">
+            {% for g in u.groups.all %}{{ g.name }}{% if not forloop.last %}، {% endif %}{% empty %}—{% endfor %}
+          </td>
+          <td><a class="btn btn-sm" href="{% url 'console_user_edit' u.pk %}">تعديل</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="muted">لا نتائج.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if is_paginated %}
+  <p class="pagination-bar">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}&status={{ request.GET.status }}">السابق</a>
+    {% endif %}
+    صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}&status={{ request.GET.status }}">التالي</a>
+    {% endif %}
+  </p>
+  {% endif %}
+
+  <p style="margin-top:1rem;"><a class="btn btn-ghost" href="{% url 'console_dashboard' %}">← اللوحة</a></p>
+</div>
+{% endblock %}

@@ -24,9 +24,9 @@
     <span class="nav-section">إشراف</span>
     <a class="nav-item" href="{% url 'moderation_home' %}">لوحة الإشراف</a>
     {% endif %}
-    {% if user.is_superuser %}
+    {% if show_console_nav %}
     <span class="nav-section">نظام</span>
-    <a class="nav-item" href="/admin/">إدارة Django (سوبر يوزر)</a>
+    <a class="nav-item" href="{% url 'console_dashboard' %}">لوحة التحكم</a>
     {% endif %}
     <span class="nav-section">الحساب</span>
     <form method="post" action="{% url 'logout' %}">

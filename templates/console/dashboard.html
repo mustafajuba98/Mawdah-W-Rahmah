@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}لوحة التحكم — مودة ورحمة{% endblock %}
+{% block content %}
+<div class="card dash-highlight">
+  <h1>لوحة تحكم المسؤول</h1>
+  <p class="muted">إدارة المستخدمين والأدوار من واجهة المنصة (بدون Django Admin).</p>
+</div>
+
+<div class="console-stats">
+  <div class="stat-card">
+    <span class="stat-num">{{ total_users }}</span>
+    <span class="stat-label">إجمالي المستخدمين</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-num">{{ active_members }}</span>
+    <span class="stat-label">حسابات مفعّلة</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-num">{{ pending_review }}</span>
+    <span class="stat-label">قيد المراجعة</span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>توزيع حالات الحساب</h2>
+  <ul class="status-breakdown">
+    {% for label, count in breakdown %}
+      <li><strong>{{ label }}</strong> — {{ count }}</li>
+    {% endfor %}
+  </ul>
+  <p class="muted" style="margin-top:1rem;font-size:0.88rem;">للتفاصيل: قائمة المستخدمين.</p>
+  <a class="btn" href="{% url 'console_user_list' %}">المستخدمون</a>
+  <a class="btn btn-secondary" href="{% url 'console_user_create' %}">مستخدم جديد</a>
+  <a class="btn btn-ghost" href="{% url 'moderation_home' %}">لوحة الإشراف</a>
+</div>
+{% endblock %}

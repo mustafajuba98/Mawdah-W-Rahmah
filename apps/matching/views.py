@@ -83,16 +83,42 @@ def send_introduction(request, pk):
         return redirect("browse")
     if request.method == "POST":
         msg = request.POST.get("message", "")[:2000]
-        intro, created = IntroductionRequest.objects.get_or_create(
+        existing = IntroductionRequest.objects.filter(
             requester=request.user,
             recipient=recipient,
-            defaults={"message": msg, "status": IntroductionRequest.Status.PENDING},
+        ).first()
+        if existing:
+            st = existing.status
+            if st == IntroductionRequest.Status.REJECTED:
+                messages.error(
+                    request,
+                    "لا يمكن إعادة إرسال طلب رؤية شرعية بعد رفض المشرف لهذا الطلب.",
+                )
+            elif st == IntroductionRequest.Status.PENDING:
+                messages.info(
+                    request,
+                    "سبق إرسال طلب لهذا الشخص؛ ما زال بانتظار رد الطرف الآخر.",
+                )
+            elif st == IntroductionRequest.Status.PENDING_MODERATOR:
+                messages.info(request, "الطلب قيد مراجعة المشرف.")
+            elif st == IntroductionRequest.Status.APPROVED:
+                messages.info(
+                    request,
+                    "سبق الموافقة على هذا الطلب؛ يمكنكم التواصل عبر «الرسائل».",
+                )
+            elif st == IntroductionRequest.Status.ACCEPTED:
+                messages.info(request, "هذا الطلب قيد المعالجة.")
+            else:
+                messages.info(request, "سبق إرسال طلب لهذا الشخص.")
+            return redirect("browse")
+        IntroductionRequest.objects.create(
+            requester=request.user,
+            recipient=recipient,
+            message=msg,
+            status=IntroductionRequest.Status.PENDING,
         )
-        if not created:
-            messages.info(request, "سبق إرسال طلب لهذا الشخص.")
-        else:
-            log_action(request.user, "intro_sent", target_user=recipient, metadata={})
-            messages.success(request, "تم إرسال طلب الرؤية الشرعية.")
+        log_action(request.user, "intro_sent", target_user=recipient, metadata={})
+        messages.success(request, "تم إرسال طلب الرؤية الشرعية.")
         return redirect("browse")
     return render(
         request,

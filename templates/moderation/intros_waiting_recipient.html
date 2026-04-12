@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}طلبات بانتظار الطرف الآخر — إشراف{% endblock %}
+{% block content %}
+<div class="moderation-layout">
+  {% include "moderation/_tabs.html" %}
+  <div class="card mod-tab-panel">
+    <h1 style="margin-top:0;">طلبات رؤية بانتظار رد المستلم</h1>
+    <p class="muted mod-subhint">
+      تظهر هنا فور إرسال الطلب؛ لا تصل لقائمة «قرار المشرف» إلا بعد أن يقبل المستلم الطلب.
+    </p>
+    {% for i in page_obj %}
+      <div class="mod-row mod-row-stack">
+        <div class="meta">
+          <div><strong>من:</strong> {{ i.requester.email }}
+            {% if i.requester.applicant_profile %}<span class="muted"> — {{ i.requester.applicant_profile.full_name }}</span>{% endif %}
+          </div>
+          <div><strong>إلى:</strong> {{ i.recipient.email }}
+            {% if i.recipient.applicant_profile %}<span class="muted"> — {{ i.recipient.applicant_profile.full_name }}</span>{% endif %}
+          </div>
+          <div class="muted" style="font-size:0.86rem;margin-top:0.35rem;">أُرسل {{ i.created_at|date:"Y-m-d H:i" }}</div>
+          {% if i.message %}
+            <div class="intro-msg-preview"><strong>الرسالة:</strong> {{ i.message }}</div>
+          {% endif %}
+        </div>
+      </div>
+    {% empty %}
+      <p class="muted mod-empty">لا توجد طلبات في هذه المرحلة.</p>
+    {% endfor %}
+    {% include "moderation/_pagination.html" %}
+  </div>
+</div>
+{% endblock %}

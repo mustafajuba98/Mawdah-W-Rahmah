@@ -1,0 +1,20 @@
+<nav class="mod-tabs" aria-label="أقسام الإشراف">
+  <a
+    href="{% url 'moderation_pending_profiles' %}"
+    class="mod-tab {% if moderation_tab == 'profiles' %}is-active{% endif %}"
+  >ملفات قيد المراجعة</a>
+  <a
+    href="{% url 'moderation_intros_waiting_recipient' %}"
+    class="mod-tab {% if moderation_tab == 'intros_recipient' %}is-active{% endif %}"
+  >طلبات بانتظار الطرف الآخر</a>
+  <a
+    href="{% url 'moderation_intros_waiting_decision' %}"
+    class="mod-tab {% if moderation_tab == 'intros_mod' %}is-active{% endif %}"
+  >طلبات بانتظار قرار المشرف</a>
+  {% if show_accounts_tab %}
+  <a
+    href="{% url 'moderation_active_accounts' %}"
+    class="mod-tab {% if moderation_tab == 'accounts' %}is-active{% endif %}"
+  >حسابات مفعّلة</a>
+  {% endif %}
+</nav>

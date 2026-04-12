@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}طلبات بانتظار المشرف — إشراف{% endblock %}
+{% block content %}
+<div class="moderation-layout">
+  {% include "moderation/_tabs.html" %}
+  <div class="card mod-tab-panel">
+    <h1 style="margin-top:0;">طلبات رؤية بانتظار قرارك</h1>
+    <p class="muted mod-subhint">بعد قبول المستلم للطلب يظهر هنا لاتخاذ قرار الموافقة أو الرفض.</p>
+    {% for i in page_obj %}
+      <div class="mod-row mod-row-stack">
+        <div class="meta">
+          <div><strong>من:</strong> {{ i.requester.email }}</div>
+          <div><strong>إلى:</strong> {{ i.recipient.email }}</div>
+          {% if i.message %}
+            <div class="intro-msg-preview"><strong>الرسالة:</strong> {{ i.message }}</div>
+          {% endif %}
+        </div>
+        <div class="actions">
+          <a class="btn btn-sm" href="{% url 'moderation_decide_intro' i.pk %}">اتخاذ قرار</a>
+        </div>
+      </div>
+    {% empty %}
+      <p class="muted mod-empty">لا توجد طلبات معلّقة.</p>
+    {% endfor %}
+    {% include "moderation/_pagination.html" %}
+  </div>
+</div>
+{% endblock %}

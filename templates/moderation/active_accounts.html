@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}حسابات مفعّلة — إشراف{% endblock %}
+{% block content %}
+<div class="moderation-layout">
+  {% include "moderation/_tabs.html" %}
+  <div class="card mod-tab-panel">
+    <h1 style="margin-top:0;">حسابات مفعّلة — إيقاف (مسؤول المنصة)</h1>
+    <p class="muted mod-subhint">عرض {{ page_obj.paginator.per_page }} حساب في الصفحة.</p>
+    {% if page_obj.paginator.count %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>البريد</th>
+            <th style="width:9rem;">إجراء</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in page_obj %}
+          <tr>
+            <td>{{ u.email }}</td>
+            <td><a class="btn btn-sm btn-secondary" style="margin:0;" href="{% url 'moderation_suspend_user' u.pk %}">إيقاف</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="muted mod-empty">لا يوجد.</p>
+    {% endif %}
+    {% include "moderation/_pagination.html" %}
+  </div>
+</div>
+{% endblock %}

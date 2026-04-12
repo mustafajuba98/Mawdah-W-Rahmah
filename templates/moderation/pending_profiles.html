@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}ملفات قيد المراجعة — إشراف{% endblock %}
+{% block content %}
+<div class="moderation-layout">
+  {% include "moderation/_tabs.html" %}
+  <div class="card mod-tab-panel">
+    <h1 style="margin-top:0;">ملفات بانتظار المراجعة</h1>
+    <p class="muted mod-subhint">استمارات جديدة تحتاج تفعيلاً أو رفضاً قبل أن يتصفح العضو.</p>
+    {% for u in page_obj %}
+      <div class="mod-row">
+        <div class="meta">
+          <strong>{{ u.applicant_profile.full_name }}</strong><br>
+          <span class="muted">{{ u.email }}</span>
+        </div>
+        <div class="actions">
+          <a class="btn btn-sm" href="{% url 'moderation_approve_profile' u.pk %}">تفعيل</a>
+          <a class="btn btn-sm btn-secondary" href="{% url 'moderation_reject_profile' u.pk %}">رفض</a>
+        </div>
+      </div>
+    {% empty %}
+      <p class="muted mod-empty">لا يوجد ملفات في الانتظار.</p>
+    {% endfor %}
+    {% include "moderation/_pagination.html" %}
+  </div>
+</div>
+{% endblock %}

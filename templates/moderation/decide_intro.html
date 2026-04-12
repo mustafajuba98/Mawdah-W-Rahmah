@@ -1,13 +1,19 @@
 {% extends "base.html" %}
+{% block title %}قرار المشرف — طلب رؤية{% endblock %}
 {% block content %}
 <div class="card">
   <h1>قرار المشرف — طلب رؤية</h1>
-  <p>من {{ intro.requester.email }} إلى {{ intro.recipient.email }}</p>
+  <p><strong>من:</strong> {{ intro.requester.email }}</p>
+  <p><strong>إلى:</strong> {{ intro.recipient.email }}</p>
+  {% if intro.message %}
+    <p class="intro-msg-preview" style="margin:1rem 0;"><strong>رسالة الطلب:</strong> {{ intro.message }}</p>
+  {% endif %}
   <form method="post">
     {% csrf_token %}
     <label>ملاحظات<textarea name="notes" rows="3"></textarea></label>
     <button type="submit" name="decision" value="approve" class="btn">موافقة وفتح التواصل</button>
     <button type="submit" name="decision" value="reject" class="btn btn-secondary">رفض</button>
   </form>
+  <p style="margin-top:1rem;"><a class="btn btn-ghost" href="{% url 'moderation_intros_waiting_decision' %}">رجوع للقائمة</a></p>
 </div>
 {% endblock %}

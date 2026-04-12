@@ -4,32 +4,84 @@
 <meta name="csrf-token" content="{{ csrf_token }}">
 {% endblock %}
 {% block content %}
-<div class="card">
-  <div class="chat-header">
-    <a class="btn btn-ghost btn-sm" href="{% url 'conversation_list' %}">← المحادثات</a>
-    <span class="muted">مع {{ other_user.email }}</span>
-  </div>
-  <div id="chat-log">
+<div class="chat-room-card card">
+  <header class="chat-room-head">
+    <div>
+      <a class="btn btn-ghost btn-sm" href="{% url 'conversation_list' %}">← المحادثات</a>
+      <p class="chat-peer-name" style="margin:0.5rem 0 0;">{% if other_user.applicant_profile %}{{ other_user.applicant_profile.full_name }}{% else %}{{ other_user.email }}{% endif %}</p>
+      <p class="chat-peer-sub" style="margin:0.15rem 0 0;">{{ other_user.email }}</p>
+    </div>
+    <div
+      id="chat-end-wrap"
+      class="chat-head-actions chat-actions-end{% if not conversation.can_send_messages %} is-collapsed{% endif %}"
+    >
+      <button type="button" class="btn btn-ghost btn-sm" id="btn-end-chat">إنهاء المحادثة</button>
+    </div>
+  </header>
+
+  <div id="chat-alerts" class="chat-banners"></div>
+
+  <div id="chat-log" class="chat-log" role="log" aria-live="polite">
     {% for m in messages_list %}
       <div class="msg {% if m.sender_id == user.id %}me{% else %}them{% endif %}" data-id="{{ m.id }}">{{ m.body }}</div>
     {% endfor %}
   </div>
-  <form id="send-form" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin-top:0.75rem;">
-    {% csrf_token %}
-    <input type="text" id="msg-body" name="body" autocomplete="off" placeholder="اكتب رسالة…" style="flex:1;min-width:180px;margin:0;">
-    <button type="submit" class="btn" style="margin:0;">إرسال</button>
-  </form>
-  <p class="muted" style="margin-bottom:0;font-size:0.82rem;">تحديث تلقائي عبر Long Polling.</p>
+
+  <div id="chat-compose" class="chat-composer-wrap">
+    <form id="send-form" class="chat-composer">
+      {% csrf_token %}
+      <input type="text" id="msg-body" name="body" autocomplete="off" placeholder="اكتب رسالة…" maxlength="8000">
+      <button type="submit" class="btn">إرسال</button>
+    </form>
+  </div>
 </div>
+
+<dialog id="dlg-close-chat" class="chat-modal">
+  <form method="dialog" class="chat-modal-inner">
+    <h2 style="margin:0 0 0.5rem;font-size:1.05rem;">إنهاء المحادثة؟</h2>
+    <p class="muted" style="margin:0;line-height:1.55;">لن يتمكن أحد الطرفين من إرسال رسائل بعد الإنهاء. إعادة الفتح تتطلب طلباً من أحدكما وموافقة الآخر.</p>
+    <div class="chat-modal-actions">
+      <button type="button" class="btn btn-secondary" id="dlg-close-cancel" value="cancel">إلغاء</button>
+      <button type="button" class="btn" id="dlg-close-confirm">تأكيد الإنهاء</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-reject-reopen" class="chat-modal">
+  <form method="dialog" class="chat-modal-inner">
+    <h2 style="margin:0 0 0.5rem;font-size:1.05rem;">رفض إعادة فتح المحادثة؟</h2>
+    <p class="muted" style="margin:0;">ستبقى المحادثة منتهية دون إشعار الطرف الآخر بسبب.</p>
+    <div class="chat-modal-actions">
+      <button type="button" class="btn btn-secondary" id="dlg-reject-cancel">إلغاء</button>
+      <button type="button" class="btn btn-secondary" id="dlg-reject-confirm">تأكيد الرفض</button>
+    </div>
+  </form>
+</dialog>
+
 <script>
 (function() {
   const logEl = document.getElementById('chat-log');
   let lastId = {{ last_message_id }};
   const pollUrl = "{% url 'conversation_poll' conversation.pk %}";
   const postUrl = "{% url 'conversation_post' conversation.pk %}";
+  const closeUrl = "{% url 'conversation_close' conversation.pk %}";
+  const reopenReqUrl = "{% url 'conversation_reopen_request' conversation.pk %}";
+  const reopenRespUrl = "{% url 'conversation_reopen_respond' conversation.pk %}";
   const myId = {{ user.id }};
   const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value
     || document.querySelector('meta[name=csrf-token]')?.getAttribute('content');
+
+  const alertsEl = document.getElementById('chat-alerts');
+  const composeEl = document.getElementById('chat-compose');
+  const btnEnd = document.getElementById('btn-end-chat');
+  const endWrap = document.getElementById('chat-end-wrap');
+  const dlgClose = document.getElementById('dlg-close-chat');
+  const dlgReject = document.getElementById('dlg-reject-reopen');
+
+  function scrollLog() {
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  scrollLog();
 
   function appendMsg(m) {
     const div = document.createElement('div');
@@ -37,8 +89,104 @@
     div.dataset.id = m.id;
     div.textContent = m.body;
     logEl.appendChild(div);
-    logEl.scrollTop = logEl.scrollHeight;
+    scrollLog();
   }
+
+  function clearAlerts() {
+    alertsEl.innerHTML = '';
+  }
+
+  function banner(html, kind) {
+    const d = document.createElement('div');
+    d.className = 'chat-banner chat-banner--' + (kind || 'neutral');
+    d.innerHTML = html;
+    alertsEl.appendChild(d);
+  }
+
+  function setEndChatVisible(show) {
+    if (endWrap) endWrap.classList.toggle('is-collapsed', !show);
+    if (btnEnd) btnEnd.setAttribute('aria-hidden', show ? 'false' : 'true');
+  }
+
+  function applyConversationState(c) {
+    if (!c) return;
+    clearAlerts();
+    const s = String(c.status || '').trim();
+    const reopenBy = c.reopen_requested_by_id;
+
+    setEndChatVisible(false);
+    composeEl.hidden = true;
+
+    if (s === 'active') {
+      composeEl.hidden = false;
+      setEndChatVisible(true);
+      return;
+    }
+    if (s === 'closed') {
+      banner('<strong>المحادثة منتهية.</strong> لا يمكن إرسال رسائل. يمكنك طلب إعادة الفتح؛ يلزم موافقة الطرف الآخر.', 'warn');
+      const row = document.createElement('div');
+      row.className = 'chat-banner-actions';
+      row.innerHTML = '<button type="button" class="btn btn-sm" id="btn-request-reopen">طلب إعادة فتح المحادثة</button>';
+      alertsEl.appendChild(row);
+      document.getElementById('btn-request-reopen').addEventListener('click', requestReopen);
+      return;
+    }
+    if (s === 'reopen_pending') {
+      if (reopenBy === myId) {
+        banner('<strong>تم إرسال طلب إعادة الفتح.</strong> بانتظار موافقة الطرف الآخر.', 'info');
+      } else {
+        banner('<strong>الطرف الآخر يطلب إعادة فتح المحادثة.</strong> يمكنك الموافقة أو الرفض.', 'info');
+        const row = document.createElement('div');
+        row.className = 'chat-banner-actions';
+        row.innerHTML =
+          '<button type="button" class="btn btn-sm" id="btn-accept-reopen">موافقة</button>' +
+          '<button type="button" class="btn btn-sm btn-secondary" id="btn-reject-reopen">رفض</button>';
+        alertsEl.appendChild(row);
+        document.getElementById('btn-accept-reopen').addEventListener('click', () => respondReopen(true));
+        document.getElementById('btn-reject-reopen').addEventListener('click', () => dlgReject.showModal());
+      }
+    }
+  }
+
+  function postForm(url, data) {
+    const fd = new FormData();
+    Object.entries(data || {}).forEach(([k, v]) => fd.append(k, v));
+    fd.append('csrfmiddlewaretoken', csrftoken);
+    return fetch(url, { method: 'POST', body: fd, credentials: 'same-origin' }).then(r => r.json());
+  }
+
+  function requestReopen() {
+    postForm(reopenReqUrl, {}).then(data => {
+      if (data.ok) applyConversationState(data.conversation);
+    });
+  }
+
+  function respondReopen(accept) {
+    postForm(reopenRespUrl, { accept: accept ? '1' : '0' }).then(data => {
+      if (data.ok) applyConversationState(data.conversation);
+    });
+  }
+
+  document.getElementById('dlg-reject-cancel').addEventListener('click', () => dlgReject.close());
+  document.getElementById('dlg-reject-confirm').addEventListener('click', () => {
+    dlgReject.close();
+    respondReopen(false);
+  });
+
+  btnEnd.addEventListener('click', () => dlgClose.showModal());
+  document.getElementById('dlg-close-cancel').addEventListener('click', () => dlgClose.close());
+  document.getElementById('dlg-close-confirm').addEventListener('click', () => {
+    dlgClose.close();
+    postForm(closeUrl, {}).then(data => {
+      if (data.ok) applyConversationState(data.conversation);
+    });
+  });
+
+  applyConversationState({
+    status: "{{ conversation.status }}",
+    closed_by_id: {% if conversation.closed_by_id %}{{ conversation.closed_by_id }}{% else %}null{% endif %},
+    reopen_requested_by_id: {% if conversation.reopen_requested_by_id %}{{ conversation.reopen_requested_by_id }}{% else %}null{% endif %},
+  });
 
   function poll() {
     fetch(pollUrl + '?since=' + lastId, {
@@ -47,6 +195,7 @@
     })
       .then(r => r.json())
       .then(data => {
+        if (data.conversation) applyConversationState(data.conversation);
         (data.messages || []).forEach(m => {
           if (m.id > lastId) {
             appendMsg(m);
@@ -73,6 +222,7 @@
     })
       .then(r => r.json())
       .then(data => {
+        if (data.conversation) applyConversationState(data.conversation);
         if (data.ok && data.message) {
           document.getElementById('msg-body').value = '';
           if (data.message.id > lastId) {

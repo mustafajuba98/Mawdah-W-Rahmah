@@ -11,6 +11,7 @@ from apps.moderation.models import AuditLog
 from services.access import (
     can_view_contact_details,
     can_view_full_profile,
+    can_view_intro_requester_preview,
     can_view_profile_browse,
     log_profile_view,
 )
@@ -108,11 +109,14 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         viewer = self.request.user
         ctx["browse_ok"] = can_view_profile_browse(viewer, target)
         ctx["full_ok"] = can_view_full_profile(viewer, target)
+        ctx["intro_preview_ok"] = can_view_intro_requester_preview(viewer, target)
         ctx["contact_ok"] = can_view_contact_details(viewer, target)
-        if ctx["browse_ok"]:
-            log_profile_view(AuditLog, viewer, target, "browse", self.request)
-        elif ctx["full_ok"]:
+        if ctx["full_ok"]:
             log_profile_view(AuditLog, viewer, target, "full", self.request)
+        elif ctx["intro_preview_ok"]:
+            log_profile_view(AuditLog, viewer, target, "intro_preview", self.request)
+        elif ctx["browse_ok"]:
+            log_profile_view(AuditLog, viewer, target, "browse", self.request)
         if ctx.get("contact_ok") and viewer.pk != target.pk:
             log_action(viewer, "contact_details_viewed", target_user=target, metadata={})
         return ctx

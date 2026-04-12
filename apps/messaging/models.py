@@ -3,6 +3,11 @@ from django.db import models
 
 
 class Conversation(models.Model):
+    class Status(models.TextChoices):
+        ACTIVE = "active", "نشطة"
+        CLOSED = "closed", "منتهية"
+        REOPEN_PENDING = "reopen_pending", "بانتظار موافقة إعادة الفتح"
+
     introduction = models.OneToOneField(
         "matching.IntroductionRequest",
         on_delete=models.CASCADE,
@@ -18,7 +23,28 @@ class Conversation(models.Model):
         on_delete=models.CASCADE,
         related_name="conversations_as_b",
     )
+    status = models.CharField(
+        max_length=32,
+        choices=Status.choices,
+        default=Status.ACTIVE,
+    )
+    closed_at = models.DateTimeField(null=True, blank=True)
+    closed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="conversations_closed",
+    )
+    reopen_requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="conversations_reopen_requested",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "محادثة"
@@ -29,6 +55,9 @@ class Conversation(models.Model):
 
     def involves(self, user):
         return user.pk in (self.user_a_id, self.user_b_id)
+
+    def can_send_messages(self) -> bool:
+        return self.status == self.Status.ACTIVE
 
 
 class Message(models.Model):

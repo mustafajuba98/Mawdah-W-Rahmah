@@ -4,17 +4,29 @@
 <div class="card">
   {% if not target_user.applicant_profile %}
     <p class="muted" style="margin:0;">لا يوجد ملف لهذا الحساب.</p>
-  {% elif not browse_ok and not full_ok %}
+  {% elif not browse_ok and not full_ok and not intro_preview_ok %}
     <p class="muted" style="margin:0;">لا يمكن عرض هذا الملف.</p>
   {% else %}
     {% with p=target_user.applicant_profile %}
       <div class="profile-card-head" style="border-radius:12px;margin-bottom:1rem;">
         <div class="profile-card-avatar">{{ p.full_name|slice:":1" }}</div>
         <div class="profile-card-meta">
-          <h1 style="margin:0;font-size:1.35rem;">{{ p.full_name|slice:":1" }}•••</h1>
+          {% if full_ok or intro_preview_ok %}
+            <h1 style="margin:0;font-size:1.35rem;">{{ p.full_name }}</h1>
+          {% else %}
+            <h1 style="margin:0;font-size:1.35rem;">{{ p.full_name|slice:":1" }}•••</h1>
+          {% endif %}
           <p class="sub">{{ p.get_governorate_display_ar }} — العمر {{ p.age }}</p>
         </div>
       </div>
+
+      {% if intro_preview_ok and not full_ok %}
+        <div class="intro-preview-notice chat-banner chat-banner--info" style="margin-bottom:1rem;">
+          <strong>طلب رؤية شرعية وارد.</strong>
+          استعرض الملخص أدناه لاتخاذ قرارك؛ بيانات التواصل لا تُعرض إلا بعد قبولك ثم موافقة المشرف.
+        </div>
+      {% endif %}
+
       {% if full_ok %}
         <h2 style="font-size:1.05rem;">تفاصيل الملف</h2>
         <p><span class="muted">المؤهل:</span> {{ p.get_education_display }}</p>
@@ -31,6 +43,28 @@
         {% else %}
           <p class="muted">بيانات التواصل تظهر بعد موافقة المشرف على طلب الرؤية الشرعية.</p>
         {% endif %}
+      {% elif intro_preview_ok %}
+        <h2 style="font-size:1.05rem;">ملخص الملف قبل القبول</h2>
+        <p><span class="muted">المؤهل:</span> {{ p.get_education_display }}</p>
+        <p><span class="muted">الحالة الاجتماعية:</span> {{ p.get_marital_status_display }}</p>
+        <p><span class="muted">محل الإقامة:</span> {{ p.residence_summary }}</p>
+        <p><span class="muted">الوظيفة:</span> {{ p.job_title|default:"—" }}</p>
+        <p><span class="muted">الطول / الوزن:</span>
+          {% if p.height_cm or p.weight_kg %}
+            {% if p.height_cm %}{{ p.height_cm }} سم{% endif %}
+            {% if p.height_cm and p.weight_kg %} — {% endif %}
+            {% if p.weight_kg %}{{ p.weight_kg }} كجم{% endif %}
+          {% else %}
+            —
+          {% endif %}
+        </p>
+        {% if p.quran_parts %}
+          <p><span class="muted">الحفظ:</span> {{ p.quran_parts }} جزءاً تقريباً</p>
+        {% endif %}
+        <p><span class="muted">نبذة:</span><br>{% if p.about_me %}{{ p.about_me|linebreaksbr }}{% else %}—{% endif %}</p>
+        <p><span class="muted">مواصفات شريك الحياة:</span><br>{% if p.partner_specs %}{{ p.partner_specs|linebreaksbr }}{% else %}—{% endif %}</p>
+        <p class="muted" style="margin-top:1rem;">بعد قبول الطلب ينتقل لمراجعة المشرف؛ عند الموافقة يمكنكم رؤية التفاصيل الإضافية والتواصل.</p>
+        <p style="margin-top:1rem;"><a class="btn btn-ghost btn-sm" href="{% url 'intro_inbox' %}">← العودة إلى الطلبات</a></p>
       {% else %}
         <p class="muted">لعرض التفاصيل الكاملة يلزم مسار التعارف والموافقات.</p>
         {% if browse_ok %}

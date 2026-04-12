@@ -1,5 +1,6 @@
 from apps.accounts.models import User
 from apps.matching.models import IntroductionRequest
+from apps.profiles.models import ApplicantProfile
 
 
 def _staff_like(user):
@@ -17,12 +18,12 @@ def can_view_profile_browse(viewer, target_user):
         return False
     if viewer.profile_status != User.ProfileStatus.ACTIVE:
         return False
-    if not hasattr(target_user, "applicant_profile"):
-        return False
     if target_user.profile_status != User.ProfileStatus.ACTIVE:
         return False
-    vp = viewer.applicant_profile
-    tp = target_user.applicant_profile
+    vp = ApplicantProfile.objects.filter(user=viewer).first()
+    tp = ApplicantProfile.objects.filter(user=target_user).first()
+    if not vp or not tp:
+        return False
     if vp.applicant_gender == tp.applicant_gender:
         return False
     return True
@@ -50,6 +51,20 @@ def can_view_full_profile(viewer, target_user):
 def can_view_contact_details(viewer, target_user):
     """بيانات التواصل بعد نفس بوابة الملف الكامل."""
     return can_view_full_profile(viewer, target_user)
+
+
+def can_view_intro_requester_preview(viewer, target_user):
+    """
+    المستلم لطلب رؤية معلّق (بانتظار قبوله) يرى ملخصاً أوضح عن مقدّم الطلب
+    لاتخاذ قرار القبول — دون بيانات تواصل حتى موافقة المشرف.
+    """
+    if not viewer.is_authenticated:
+        return False
+    return IntroductionRequest.objects.filter(
+        requester=target_user,
+        recipient=viewer,
+        status=IntroductionRequest.Status.PENDING,
+    ).exists()
 
 
 def log_profile_view(audit_model, viewer, target_user, detail_level, request):

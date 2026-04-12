@@ -3,7 +3,7 @@
 {% block content %}
 <div class="card">
   <h1 style="margin-top:0;">طلبات الرؤية الشرعية</h1>
-  <p class="muted">الواردة تحتاج موافقتك أحياناً؛ الصادرة تظهر حالة طلبك لدى الطرف الآخر.</p>
+  <p class="muted">الواردة: راجع ملخص مقدّم الطلب ثم قرّر القبول. الصادرة: تظهر مرحلة طلبك لدى الطرف الآخر والمشرف.</p>
 </div>
 
 <div class="inbox-grid">
@@ -12,14 +12,22 @@
     {% for i in incoming %}
       <div class="request-item">
         <div class="row-top">
-          <span class="who">من {% if i.requester.applicant_profile %}{{ i.requester.applicant_profile.full_name|slice:":1" }}•••{% else %}{{ i.requester.email }}{% endif %}</span>
+          <span class="who">
+            من
+            {% if i.requester.applicant_profile %}
+              {{ i.requester.applicant_profile.full_name }}
+            {% else %}
+              {{ i.requester.email }}
+            {% endif %}
+          </span>
           <span class="badge">{{ i.get_status_display }}</span>
         </div>
         {% if i.message %}
-          <p class="muted" style="margin:0.4rem 0 0;font-size:0.88rem;">{{ i.message|truncatewords:20 }}</p>
+          <p class="intro-inbox-msg"><span class="muted">رسالته:</span> {{ i.message }}</p>
         {% endif %}
         {% if i.status == "pending" %}
-          <div class="actions">
+          <div class="actions inbox-actions-row">
+            <a class="btn btn-sm btn-ghost" href="{% url 'profile_detail' i.requester.pk %}">عرض الملف قبل القرار</a>
             <form method="post" action="{% url 'accept_intro' i.pk %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-sm">قبول الطلب</button></form>
           </div>
         {% endif %}
@@ -34,11 +42,18 @@
     {% for i in outgoing %}
       <div class="request-item">
         <div class="row-top">
-          <span class="who">إلى {% if i.recipient.applicant_profile %}{{ i.recipient.applicant_profile.full_name|slice:":1" }}•••{% else %}{{ i.recipient.email }}{% endif %}</span>
+          <span class="who">
+            إلى
+            {% if i.recipient.applicant_profile %}
+              {{ i.recipient.applicant_profile.full_name }}
+            {% else %}
+              {{ i.recipient.email }}
+            {% endif %}
+          </span>
           <span class="badge">{{ i.get_status_display }}</span>
         </div>
         {% if i.message %}
-          <p class="muted" style="margin:0.4rem 0 0;font-size:0.88rem;">{{ i.message|truncatewords:20 }}</p>
+          <p class="intro-inbox-msg muted" style="font-size:0.88rem;">{{ i.message|truncatewords:40 }}</p>
         {% endif %}
       </div>
     {% empty %}

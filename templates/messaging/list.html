@@ -1,21 +1,39 @@
 {% extends "base.html" %}
 {% block title %}المحادثات{% endblock %}
 {% block content %}
-<div class="card">
+<div class="card chat-list-intro">
   <h1 style="margin-top:0;">محادثاتك</h1>
-  <p class="muted">تفتح المحادثة بعد موافقة المشرف على طلب الرؤية الشرعية.</p>
+  <p class="muted" style="margin-bottom:0;">تفتح المحادثة بعد موافقة المشرف على طلب الرؤية الشرعية. يمكن لأي طرف إنهاء المحادثة أو طلب إعادة فتحها بموافقة الآخر.</p>
 </div>
-<div class="conv-list">
+<div class="conv-list conv-list-wide">
   {% for c in conversations %}
     <a class="conv-row" href="{% url 'conversation_room' c.pk %}">
       <div class="av">
-        {% if c.user_a_id == user.id %}{{ c.user_b.email|slice:":1"|upper }}{% else %}{{ c.user_a.email|slice:":1"|upper }}{% endif %}
+        {% if c.user_a_id == user.id %}
+          {% if c.user_b.applicant_profile %}{{ c.user_b.applicant_profile.full_name|slice:":1" }}{% else %}{{ c.user_b.email|slice:":1"|upper }}{% endif %}
+        {% else %}
+          {% if c.user_a.applicant_profile %}{{ c.user_a.applicant_profile.full_name|slice:":1" }}{% else %}{{ c.user_a.email|slice:":1"|upper }}{% endif %}
+        {% endif %}
       </div>
       <div class="txt">
-        <strong>
-          {% if c.user_a_id == user.id %}محادثة مع {{ c.user_b.email }}{% else %}محادثة مع {{ c.user_a.email }}{% endif %}
-        </strong>
-        <span>اضغط للدخول إلى الرسائل</span>
+        <span class="conv-row-topline">
+          <strong>
+            {% if c.user_a_id == user.id %}
+              {% if c.user_b.applicant_profile %}{{ c.user_b.applicant_profile.full_name }}{% else %}{{ c.user_b.email }}{% endif %}
+            {% else %}
+              {% if c.user_a.applicant_profile %}{{ c.user_a.applicant_profile.full_name }}{% else %}{{ c.user_a.email }}{% endif %}
+            {% endif %}
+          </strong>
+          {% if c.status == 'closed' %}
+            <span class="conv-pill conv-pill--muted">منتهية</span>
+          {% elif c.status == 'reopen_pending' %}
+            <span class="conv-pill conv-pill--pending">بانتظار موافقة</span>
+          {% endif %}
+        </span>
+        <span class="conv-sub">
+          {% if c.user_a_id == user.id %}{{ c.user_b.email }}{% else %}{{ c.user_a.email }}{% endif %}
+          · اضغط للدخول
+        </span>
       </div>
       <span class="chev">‹</span>
     </a>

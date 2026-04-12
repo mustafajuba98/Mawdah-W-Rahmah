@@ -3,6 +3,8 @@ from django.db import models
 
 from apps.accounts.models import User
 
+from .constants import EGYPT_GOVERNORATES
+
 
 class ApplicantProfile(models.Model):
     class Education(models.TextChoices):
@@ -47,11 +49,18 @@ class ApplicantProfile(models.Model):
     about_me = models.TextField("نبذة عني والأهل", blank=True)
     partner_specs = models.TextField("مواصفات شريك الحياة المطلوبة", blank=True)
     quran_parts = models.PositiveSmallIntegerField(
-        "أجزاء الحفظ",
+        "مقدار الحفظ من القرآن",
         default=0,
+        help_text="عدد الأجزاء الثلاثين التي تحفظها من القرآن الكريم (0 إن لم يكن هناك حفظ).",
     )
-    preferred_partner_age_min = models.PositiveSmallIntegerField(default=18)
-    preferred_partner_age_max = models.PositiveSmallIntegerField(default=50)
+    preferred_partner_age_min = models.PositiveSmallIntegerField(
+        "الحد الأدنى لعمر شريك الحياة المطلوب",
+        default=18,
+    )
+    preferred_partner_age_max = models.PositiveSmallIntegerField(
+        "الحد الأعلى لعمر شريك الحياة المطلوب",
+        default=50,
+    )
     whatsapp_phone = models.CharField("واتساب", max_length=32, blank=True)
     telegram_username = models.CharField("تليجرام", max_length=120, blank=True)
     facebook_url = models.CharField("فيسبوك", max_length=300, blank=True)
@@ -73,6 +82,9 @@ class ApplicantProfile(models.Model):
     def __str__(self):
         return self.full_name
 
+    def get_governorate_display_ar(self):
+        return dict(EGYPT_GOVERNORATES).get(self.governorate, self.governorate)
+
     @property
     def age(self):
         from datetime import date
@@ -90,7 +102,7 @@ class GroomExtendedProfile(models.Model):
     )
     expat = models.BooleanField("مغترب", default=False)
     take_abroad = models.BooleanField("نية السفر بالزوجة", default=False)
-    smokes = models.BooleanField(default=False)
+    smokes = models.BooleanField("مدخن؟", default=False)
     polygamy_notes = models.TextField("تفاصيل التعدد", blank=True)
 
     class Meta:

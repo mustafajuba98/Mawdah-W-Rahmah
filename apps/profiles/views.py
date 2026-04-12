@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import DetailView
 
 from apps.accounts.models import User
+from apps.accounts.roles import is_moderation_portal_user
 from apps.moderation.models import AuditLog
 from services.access import (
     can_view_contact_details,
@@ -24,6 +25,8 @@ def profile_edit(request):
     user = request.user
     gender = user.applicant_gender
     if not gender:
+        if is_moderation_portal_user(user):
+            return render(request, "profiles/staff_no_applicant.html")
         messages.error(request, "حدّد نوع مقدّم الطلب عند التسجيل أولاً.")
         return redirect("home")
 

@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import ListView
 
 from apps.accounts.models import User
+from apps.profiles.constants import EGYPT_GOVERNORATES
 from services.access import can_view_profile_browse
 from services.audit import log_action
 
@@ -47,7 +48,7 @@ class BrowseListView(LoginRequiredMixin, ListView):
 
         gov = self.request.GET.get("governorate")
         if gov:
-            qs = qs.filter(applicant_profile__governorate__icontains=gov)
+            qs = qs.filter(applicant_profile__governorate=gov)
         edu = self.request.GET.get("education")
         if edu:
             qs = qs.filter(applicant_profile__education=edu)
@@ -66,6 +67,12 @@ class BrowseListView(LoginRequiredMixin, ListView):
             qs = qs.filter(applicant_profile__birth_date__year__lte=y_max)
 
         return qs.order_by("-applicant_profile__submitted_at")
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["governorate_choices"] = EGYPT_GOVERNORATES
+        ctx["filters"] = self.request.GET
+        return ctx
 
 
 @login_required

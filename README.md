@@ -2,6 +2,8 @@
 
 Django 5.2 (LTS) project: supervised matchmaking platform (MVT, SQLite by default).
 
+**Repository:** [github.com/mustafajuba98/Mawdah-W-Rahmah](https://github.com/mustafajuba98/Mawdah-W-Rahmah)
+
 ## Run locally
 
 ```bash

@@ -4,7 +4,14 @@
 <div class="card">
   <h1>تصفح الملفات</h1>
   <form method="get" class="card" style="margin-bottom:1rem;">
-    <label>محافظة <input name="governorate" value="{{ filters.governorate }}"></label>
+    <label>محافظة
+      <select name="governorate">
+        <option value="">— الكل —</option>
+        {% for val,label in governorate_choices %}
+          <option value="{{ val }}" {% if filters.governorate == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
     <label>تعليم
       <select name="education">
         <option value="">—</option>
@@ -19,7 +26,7 @@
   <ul>
     {% for u in users %}
       <li>
-        <a href="{% url 'profile_detail' u.pk %}">{{ u.applicant_profile.full_name|slice:":1" }}*** — {{ u.applicant_profile.governorate }} — عمر {{ u.applicant_profile.age }}</a>
+        <a href="{% url 'profile_detail' u.pk %}">{{ u.applicant_profile.full_name|slice:":1" }}*** — {{ u.applicant_profile.get_governorate_display_ar }} — عمر {{ u.applicant_profile.age }}</a>
       </li>
     {% empty %}
       <li>لا توجد نتائج.</li>

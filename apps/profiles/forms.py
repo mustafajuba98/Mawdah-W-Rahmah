@@ -1,8 +1,13 @@
 from django import forms
+from django.core.exceptions import ValidationError
 
 from apps.accounts.models import User
 
+from .constants import EGYPT_GOVERNORATES
 from .models import ApplicantProfile, BrideExtendedProfile, GroomExtendedProfile, ProfileMedia
+
+# حد أقصى للصورة مناسب للاستضافة المجانية (يمكن تغييره لاحقاً مع تخزين سحابي)
+MAX_PROFILE_IMAGE_BYTES = 2 * 1024 * 1024  # 2 ميجابايت
 
 
 class ApplicantProfileForm(forms.ModelForm):
@@ -15,6 +20,11 @@ class ApplicantProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["governorate"] = forms.ChoiceField(
+            label="محافظة مصر",
+            choices=[("", "— اختر المحافظة —")] + list(EGYPT_GOVERNORATES),
+            required=True,
+        )
         optional_numbers = (
             "weight_kg",
             "height_cm",
@@ -25,6 +35,10 @@ class ApplicantProfileForm(forms.ModelForm):
         for name in optional_numbers:
             if name in self.fields:
                 self.fields[name].required = False
+        if "quran_parts" in self.fields:
+            self.fields["quran_parts"].help_text = (
+                "عدد أجزاء القرآن الثلاثين التي تحفظها (0 إن لم يكن لديك حفظ)."
+            )
 
     def clean(self):
         cleaned = super().clean()
@@ -50,6 +64,12 @@ class GroomExtraForm(forms.ModelForm):
     class Meta:
         model = GroomExtendedProfile
         exclude = ("profile",)
+        labels = {
+            "expat": "مغترب؟",
+            "take_abroad": "في حال السفر: هل تنوي أخذ الزوجة معك؟",
+            "smokes": "مدخن؟",
+            "polygamy_notes": "تفاصيل التعدد (إن وُجد)",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -62,6 +82,12 @@ class BrideExtraForm(forms.ModelForm):
     class Meta:
         model = BrideExtendedProfile
         exclude = ("profile",)
+        labels = {
+            "father_mother_work": "عمل الوالد والوالدة",
+            "siblings_summary": "عدد الإخوة ونبذة عنهم",
+            "parents_separated": "هل الوالدان منفصلان؟",
+            "hijab_type": "نوع الحجاب",
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -74,7 +100,24 @@ class ProfileMediaForm(forms.ModelForm):
     class Meta:
         model = ProfileMedia
         fields = ("image",)
+        labels = {"image": "صورة شخصية (اختياري)"}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["image"].required = False
+        self.fields["image"].help_text = (
+            f"بحد أقصى {MAX_PROFILE_IMAGE_BYTES // (1024 * 1024)} ميجابايت، صور فقط."
+        )
+
+    def clean_image(self):
+        f = self.cleaned_data.get("image")
+        if not f:
+            return f
+        if hasattr(f, "size") and f.size > MAX_PROFILE_IMAGE_BYTES:
+            raise ValidationError(
+                "حجم الصورة كبير جداً. قلّل الحجم أو ارفع صورة أصغر (الحد الأقصى 2 ميجابايت).",
+            )
+        ct = getattr(f, "content_type", "") or ""
+        if ct and not ct.startswith("image/"):
+            raise ValidationError("يُسمح برفع ملفات الصور فقط.")
+        return f

@@ -9,7 +9,7 @@
   {% else %}
     {% with p=target_user.applicant_profile %}
       <h1>{{ p.full_name|slice:":1" }}***</h1>
-      <p class="muted">المحافظة: {{ p.governorate }} — العمر: {{ p.age }}</p>
+      <p class="muted">المحافظة: {{ p.get_governorate_display_ar }} — العمر: {{ p.age }}</p>
       {% if full_ok %}
         <h2>تفاصيل الملف</h2>
         <p>المؤهل: {{ p.get_education_display }}</p>

@@ -1,20 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
+{% if user.is_authenticated and show_moderation_nav %}
+<div class="card" style="border-right: 4px solid #1e3a2f;">
+  <h2 style="margin-top:0;">لوحة العمل — الإشراف</h2>
+  <p class="muted">مراجعة الاستمارات، طلبات الرؤية الشرعية، وإدارة الحسابات.</p>
+  <p>
+    <a class="btn" href="{% url 'moderation_home' %}">لوحة الإشراف</a>
+    <a class="btn btn-secondary" href="/admin/">إدارة النظام (Django Admin)</a>
+  </p>
+</div>
+{% endif %}
+
+{% if user.is_authenticated and show_member_site_nav %}
 <div class="card">
-  <h1>مودة ورحمة</h1>
+  <h1 style="margin-top:0;">مودة ورحمة</h1>
   <p class="muted">منصة للتعارف الشرعي بإشراف فريق. البيانات الحساسة لا تُعرض إلا بعد الموافقات المحددة.</p>
-  {% if user.is_authenticated %}
-    <p>حالة حسابك: <strong>{{ user.get_profile_status_display }}</strong></p>
-    {% if user.profile_status == "pending_review" %}
-      <p class="muted">ملفك قيد المراجعة من المشرف.</p>
-    {% elif user.profile_status == "active" %}
-      <p><a class="btn" href="{% url 'browse' %}">تصفح الملفات</a></p>
-    {% else %}
-      <p><a class="btn" href="{% url 'profile_edit' %}">أكمل أو حدّث الاستمارة</a></p>
-    {% endif %}
+  <p>حالة حسابك: <strong>{{ user.get_profile_status_display }}</strong></p>
+  {% if user.profile_status == "pending_review" %}
+    <p class="muted">ملفك قيد المراجعة من المشرف.</p>
+  {% elif user.profile_status == "active" %}
+    <p><a class="btn" href="{% url 'browse' %}">تصفح الملفات</a></p>
   {% else %}
-    <p><a class="btn" href="{% url 'signup' %}">إنشاء حساب</a>
-    <a class="btn btn-secondary" href="{% url 'login' %}">تسجيل الدخول</a></p>
+    <p><a class="btn" href="{% url 'profile_edit' %}">أكمل أو حدّث الاستمارة</a></p>
   {% endif %}
 </div>
+{% elif user.is_authenticated %}
+{# مشرف بدون استمارة عضو — الرسالة التوجيهية فقط #}
+<div class="card">
+  <h1 style="margin-top:0;">مودة ورحمة</h1>
+  <p class="muted">أنت مسجّل كحساب إشراف. استخدم القائمة الجانبية للوصول إلى لوحة الإشراف أو إدارة النظام.</p>
+</div>
+{% else %}
+<div class="card">
+  <h1 style="margin-top:0;">مودة ورحمة</h1>
+  <p class="muted">منصة للتعارف الشرعي بإشراف فريق.</p>
+  <p><a class="btn" href="{% url 'signup' %}">إنشاء حساب</a>
+  <a class="btn btn-secondary" href="{% url 'login' %}">تسجيل الدخول</a></p>
+</div>
+{% endif %}
 {% endblock %}

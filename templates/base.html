@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}مودة ورحمة{% endblock %}</title>
+  <style>
+    body { font-family: system-ui, "Segoe UI", Tahoma, sans-serif; margin: 0; background: #f6f4f1; color: #1a1a1a; }
+    header { background: #1e3a2f; color: #fff; padding: 0.75rem 1.25rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; }
+    header a { color: #e8f5e9; text-decoration: none; margin-left: 1rem; }
+    header nav form { display: inline; margin: 0; padding: 0; }
+    header nav form button.nav-link {
+      background: none; border: none; color: #e8f5e9; cursor: pointer;
+      font: inherit; text-decoration: none; margin-left: 1rem; padding: 0;
+    }
+    header nav form button.nav-link:hover { text-decoration: underline; }
+    main { max-width: 900px; margin: 1.5rem auto; padding: 0 1rem; }
+    .card { background: #fff; border-radius: 8px; padding: 1.25rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 1rem; }
+    label { display: block; margin-top: 0.75rem; font-weight: 600; }
+    input, textarea, select { width: 100%; max-width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
+    button, .btn { display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #1e3a2f; color: #fff; border: none; border-radius: 6px; cursor: pointer; text-decoration: none; }
+    .btn-secondary { background: #5d6b63; }
+    .messages { list-style: none; padding: 0; }
+    .messages li { padding: 0.5rem; margin: 0.25rem 0; border-radius: 4px; }
+    .error { background: #ffebee; }
+    ul.errorlist { list-style: none; padding: 0; margin: 0.25rem 0 0.5rem; color: #b71c1c; font-weight: 600; }
+    ul.errorlist li { background: #ffebee; padding: 0.35rem 0.5rem; margin: 0.15rem 0; border-radius: 4px; }
+    .success { background: #e8f5e9; }
+    .muted { color: #555; font-size: 0.9rem; }
+    #chat-log { border: 1px solid #ccc; min-height: 220px; max-height: 360px; overflow-y: auto; padding: 0.5rem; background: #fafafa; }
+    .msg { margin: 0.35rem 0; padding: 0.35rem 0.5rem; border-radius: 4px; }
+    .msg.me { background: #c8e6c9; text-align: left; }
+    .msg.them { background: #e3f2fd; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <header>
+    <strong><a href="{% url 'home' %}" style="margin:0;">مودة ورحمة</a></strong>
+    <nav>
+      {% if user.is_authenticated %}
+        <a href="{% url 'profile_edit' %}">استمارتي</a>
+        <a href="{% url 'browse' %}">تصفح</a>
+        <a href="{% url 'intro_inbox' %}">الطلبات</a>
+        <a href="{% url 'conversation_list' %}">الرسائل</a>
+        {% if show_moderation_nav %}
+          <a href="{% url 'moderation_home' %}">الإشراف</a>
+        {% endif %}
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="nav-link">خروج</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">دخول</a>
+        <a href="{% url 'signup' %}">تسجيل</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main>
+    {% if messages %}
+      <ul class="messages">
+        {% for m in messages %}
+          <li class="{{ m.tags }}">{{ m }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

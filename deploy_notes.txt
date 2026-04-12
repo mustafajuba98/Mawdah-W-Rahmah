@@ -1,0 +1,17 @@
+Mawaddah — deployment notes (free-tier friendly)
+
+Stack aligned with the plan: Django + SQLite for this codebase branch (single-server, simple backups).
+
+Suggested providers (pick one app host + optional object storage later):
+- App: Render, Fly.io, or Railway. Note: SQLite on ephemeral disks requires persistent disk attachment or switching DB later.
+- Media: Cloudinary or S3-compatible bucket if you outgrow local MEDIA_ROOT.
+
+Process:
+1) Set DJANGO_DEBUG=False, DJANGO_SECRET_KEY, DJANGO_ALLOWED_HOSTS in environment.
+2) Run collectstatic; serve static via whitenoise (add middleware) or host CDN.
+3) python manage.py migrate && python manage.py setup_roles && createsuperuser
+4) Attach persistent volume for db.sqlite3 if the host wipes disks on deploy.
+
+Chat uses HTTP long polling (/messages/<id>/poll/); no WebSockets, no FCM, no SMS in this project.
+
+Capacity: suitable for small traffic on a single worker; monitor CPU and DB size; switch to PostgreSQL + Redis when you scale.

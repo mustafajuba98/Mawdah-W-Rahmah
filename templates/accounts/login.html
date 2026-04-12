@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}دخول — مودة ورحمة{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>تسجيل الدخول</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">دخول</button>
+  </form>
+</div>
+{% endblock %}

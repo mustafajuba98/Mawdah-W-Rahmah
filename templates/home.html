@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>مودة ورحمة</h1>
+  <p class="muted">منصة للتعارف الشرعي بإشراف فريق. البيانات الحساسة لا تُعرض إلا بعد الموافقات المحددة.</p>
+  {% if user.is_authenticated %}
+    <p>حالة حسابك: <strong>{{ user.get_profile_status_display }}</strong></p>
+    {% if user.profile_status == "pending_review" %}
+      <p class="muted">ملفك قيد المراجعة من المشرف.</p>
+    {% elif user.profile_status == "active" %}
+      <p><a class="btn" href="{% url 'browse' %}">تصفح الملفات</a></p>
+    {% else %}
+      <p><a class="btn" href="{% url 'profile_edit' %}">أكمل أو حدّث الاستمارة</a></p>
+    {% endif %}
+  {% else %}
+    <p><a class="btn" href="{% url 'signup' %}">إنشاء حساب</a>
+    <a class="btn btn-secondary" href="{% url 'login' %}">تسجيل الدخول</a></p>
+  {% endif %}
+</div>
+{% endblock %}

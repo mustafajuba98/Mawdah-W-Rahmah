@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}المحادثات{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>محادثاتك</h1>
+  <ul>
+    {% for c in conversations %}
+      <li>
+        <a href="{% url 'conversation_room' c.pk %}">
+          {% if c.user_a_id == user.id %}مع {{ c.user_b.email }}{% else %}مع {{ c.user_a.email }}{% endif %}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+  {% if not conversations %}
+    <p class="muted">لا توجد محادثات بعد موافقة المشرف على طلب رؤية.</p>
+  {% endif %}
+</div>
+{% endblock %}

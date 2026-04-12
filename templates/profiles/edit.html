@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}الاستمارة{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>استمارة مقدّم الطلب</h1>
+  {% if form.non_field_errors %}
+    {{ form.non_field_errors }}
+  {% endif %}
+  {% if extra_form and extra_form.non_field_errors %}
+    {{ extra_form.non_field_errors }}
+  {% endif %}
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {% if extra_form %}
+      <h2>بيانات إضافية</h2>
+      {{ extra_form.as_p }}
+    {% endif %}
+    <h2>صورة (اختياري)</h2>
+    {{ media_form.as_p }}
+    <button type="submit">حفظ وإرسال للمراجعة</button>
+  </form>
+</div>
+{% endblock %}

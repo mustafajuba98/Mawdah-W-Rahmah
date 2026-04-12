@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}صندوق الطلبات{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>واردة</h1>
+  <ul>
+    {% for i in incoming %}
+      <li>
+        من {% if i.requester.applicant_profile %}{{ i.requester.applicant_profile.full_name|slice:":1" }}***{% else %}{{ i.requester.email }}{% endif %} — {{ i.get_status_display }}
+        {% if i.status == "pending" %}
+          <form method="post" action="{% url 'accept_intro' i.pk %}" style="display:inline;">{% csrf_token %}<button type="submit">قبول</button></form>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>لا يوجد.</li>
+    {% endfor %}
+  </ul>
+</div>
+<div class="card">
+  <h1>صادرة</h1>
+  <ul>
+    {% for i in outgoing %}
+      <li>إلى {% if i.recipient.applicant_profile %}{{ i.recipient.applicant_profile.full_name|slice:":1" }}***{% else %}{{ i.recipient.email }}{% endif %} — {{ i.get_status_display }}</li>
+    {% empty %}
+      <li>لا يوجد.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

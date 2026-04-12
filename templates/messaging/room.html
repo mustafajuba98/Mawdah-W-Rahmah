@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}محادثة{% endblock %}
+{% block extra_head %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block content %}
+<div class="card">
+  <p><a href="{% url 'conversation_list' %}">← المحادثات</a> — مع {{ other_user.email }}</p>
+  <div id="chat-log">
+    {% for m in messages_list %}
+      <div class="msg {% if m.sender_id == user.id %}me{% else %}them{% endif %}" data-id="{{ m.id }}">{{ m.body }}</div>
+    {% endfor %}
+  </div>
+  <form id="send-form">
+    {% csrf_token %}
+    <label><input type="text" id="msg-body" name="body" autocomplete="off" placeholder="اكتب رسالة…" style="width:70%"></label>
+    <button type="submit">إرسال</button>
+  </form>
+  <p class="muted">التحديث عبر Long Polling (طلب يبقى مفتوحاً حتى وصول رسالة جديدة أو انتهاء المهلة).</p>
+</div>
+<script>
+(function() {
+  const logEl = document.getElementById('chat-log');
+  let lastId = {{ last_message_id }};
+  const pollUrl = "{% url 'conversation_poll' conversation.pk %}";
+  const postUrl = "{% url 'conversation_post' conversation.pk %}";
+  const myId = {{ user.id }};
+  const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value
+    || document.querySelector('meta[name=csrf-token]')?.getAttribute('content');
+
+  function appendMsg(m) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (m.sender_id === myId ? 'me' : 'them');
+    div.dataset.id = m.id;
+    div.textContent = m.body;
+    logEl.appendChild(div);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function poll() {
+    fetch(pollUrl + '?since=' + lastId, {
+      credentials: 'same-origin',
+      headers: { 'Accept': 'application/json' },
+    })
+      .then(r => r.json())
+      .then(data => {
+        (data.messages || []).forEach(m => {
+          if (m.id > lastId) {
+            appendMsg(m);
+            lastId = m.id;
+          }
+        });
+        poll();
+      })
+      .catch(() => setTimeout(poll, 2500));
+  }
+  poll();
+
+  document.getElementById('send-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const body = document.getElementById('msg-body').value.trim();
+    if (!body) return;
+    const fd = new FormData();
+    fd.append('body', body);
+    fd.append('csrfmiddlewaretoken', csrftoken);
+    fetch(postUrl, {
+      method: 'POST',
+      body: fd,
+      credentials: 'same-origin',
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.ok && data.message) {
+          document.getElementById('msg-body').value = '';
+          if (data.message.id > lastId) {
+            appendMsg(data.message);
+            lastId = data.message.id;
+          }
+        }
+      });
+  });
+})();
+</script>
+{% endblock %}

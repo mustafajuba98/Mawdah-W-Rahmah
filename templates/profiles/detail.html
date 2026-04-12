@@ -3,26 +3,31 @@
 {% block content %}
 <div class="card">
   {% if not target_user.applicant_profile %}
-    <p>لا يوجد ملف لهذا الحساب.</p>
+    <p class="muted" style="margin:0;">لا يوجد ملف لهذا الحساب.</p>
   {% elif not browse_ok and not full_ok %}
-    <p>لا يمكن عرض هذا الملف.</p>
+    <p class="muted" style="margin:0;">لا يمكن عرض هذا الملف.</p>
   {% else %}
     {% with p=target_user.applicant_profile %}
-      <h1>{{ p.full_name|slice:":1" }}***</h1>
-      <p class="muted">المحافظة: {{ p.get_governorate_display_ar }} — العمر: {{ p.age }}</p>
+      <div class="profile-card-head" style="border-radius:12px;margin-bottom:1rem;">
+        <div class="profile-card-avatar">{{ p.full_name|slice:":1" }}</div>
+        <div class="profile-card-meta">
+          <h1 style="margin:0;font-size:1.35rem;">{{ p.full_name|slice:":1" }}•••</h1>
+          <p class="sub">{{ p.get_governorate_display_ar }} — العمر {{ p.age }}</p>
+        </div>
+      </div>
       {% if full_ok %}
-        <h2>تفاصيل الملف</h2>
-        <p>المؤهل: {{ p.get_education_display }}</p>
-        <p>الحالة الاجتماعية: {{ p.get_marital_status_display }}</p>
-        <p>محل الإقامة: {{ p.residence_summary }}</p>
-        <p>الوظيفة: {{ p.job_title }}</p>
-        <p>نبذة: {{ p.about_me|linebreaks }}</p>
-        <p>مواصفات شريك الحياة: {{ p.partner_specs|linebreaks }}</p>
+        <h2 style="font-size:1.05rem;">تفاصيل الملف</h2>
+        <p><span class="muted">المؤهل:</span> {{ p.get_education_display }}</p>
+        <p><span class="muted">الحالة الاجتماعية:</span> {{ p.get_marital_status_display }}</p>
+        <p><span class="muted">محل الإقامة:</span> {{ p.residence_summary }}</p>
+        <p><span class="muted">الوظيفة:</span> {{ p.job_title|default:"—" }}</p>
+        <p><span class="muted">نبذة:</span><br>{% if p.about_me %}{{ p.about_me|linebreaksbr }}{% else %}—{% endif %}</p>
+        <p><span class="muted">مواصفات شريك الحياة:</span><br>{% if p.partner_specs %}{{ p.partner_specs|linebreaksbr }}{% else %}—{% endif %}</p>
         {% if contact_ok %}
-          <h2>التواصل</h2>
-          <p>واتساب: {{ p.whatsapp_phone }}</p>
-          <p>تليجرام: {{ p.telegram_username }}</p>
-          <p>فيسبوك: {{ p.facebook_url }}</p>
+          <h2 style="font-size:1.05rem;">التواصل</h2>
+          <p>واتساب: {{ p.whatsapp_phone|default:"—" }}</p>
+          <p>تليجرام: {{ p.telegram_username|default:"—" }}</p>
+          <p>فيسبوك: {{ p.facebook_url|default:"—" }}</p>
         {% else %}
           <p class="muted">بيانات التواصل تظهر بعد موافقة المشرف على طلب الرؤية الشرعية.</p>
         {% endif %}

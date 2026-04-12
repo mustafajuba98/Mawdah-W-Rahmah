@@ -9,16 +9,14 @@
   {% if extra_form and extra_form.non_field_errors %}
     {{ extra_form.non_field_errors }}
   {% endif %}
-  <form method="post" enctype="multipart/form-data">
+  <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     {% if extra_form %}
       <h2>بيانات إضافية</h2>
       {{ extra_form.as_p }}
     {% endif %}
-    <h2>صورة (اختياري)</h2>
-    {{ media_form.as_p }}
-    <button type="submit">حفظ وإرسال للمراجعة</button>
+    <button type="submit" class="btn">حفظ وإرسال للمراجعة</button>
   </form>
 </div>
 {% endblock %}

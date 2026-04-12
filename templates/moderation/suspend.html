@@ -3,7 +3,7 @@
 <div class="card">
   <h1>إيقاف حساب</h1>
   <p>{{ target_user.email }}</p>
-  <form method="post">{% csrf_token %}<button type="submit">تأكيد الإيقاف</button></form>
+  <form method="post">{% csrf_token %}<button type="submit" class="btn btn-secondary">تأكيد الإيقاف</button></form>
   <a class="btn btn-secondary" href="{% url 'moderation_home' %}">رجوع</a>
 </div>
 {% endblock %}

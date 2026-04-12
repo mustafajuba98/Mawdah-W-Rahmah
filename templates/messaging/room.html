@@ -5,18 +5,21 @@
 {% endblock %}
 {% block content %}
 <div class="card">
-  <p><a href="{% url 'conversation_list' %}">← المحادثات</a> — مع {{ other_user.email }}</p>
+  <div class="chat-header">
+    <a class="btn btn-ghost btn-sm" href="{% url 'conversation_list' %}">← المحادثات</a>
+    <span class="muted">مع {{ other_user.email }}</span>
+  </div>
   <div id="chat-log">
     {% for m in messages_list %}
       <div class="msg {% if m.sender_id == user.id %}me{% else %}them{% endif %}" data-id="{{ m.id }}">{{ m.body }}</div>
     {% endfor %}
   </div>
-  <form id="send-form">
+  <form id="send-form" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin-top:0.75rem;">
     {% csrf_token %}
-    <label><input type="text" id="msg-body" name="body" autocomplete="off" placeholder="اكتب رسالة…" style="width:70%"></label>
-    <button type="submit">إرسال</button>
+    <input type="text" id="msg-body" name="body" autocomplete="off" placeholder="اكتب رسالة…" style="flex:1;min-width:180px;margin:0;">
+    <button type="submit" class="btn" style="margin:0;">إرسال</button>
   </form>
-  <p class="muted">التحديث عبر Long Polling (طلب يبقى مفتوحاً حتى وصول رسالة جديدة أو انتهاء المهلة).</p>
+  <p class="muted" style="margin-bottom:0;font-size:0.82rem;">تحديث تلقائي عبر Long Polling.</p>
 </div>
 <script>
 (function() {

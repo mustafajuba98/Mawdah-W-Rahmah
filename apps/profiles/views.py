@@ -16,7 +16,7 @@ from services.access import (
 )
 from services.audit import log_action
 
-from .forms import ApplicantProfileForm, BrideExtraForm, GroomExtraForm, ProfileMediaForm
+from .forms import ApplicantProfileForm, BrideExtraForm, GroomExtraForm
 from .models import ApplicantProfile, BrideExtendedProfile, GroomExtendedProfile
 
 
@@ -42,7 +42,6 @@ def profile_edit(request):
             else:
                 b, _ = BrideExtendedProfile.objects.get_or_create(profile=profile)
                 extra_form = BrideExtraForm(request.POST, instance=b)
-        media_form = ProfileMediaForm(request.POST, request.FILES)
 
         if form.is_valid() and (extra_form is None or extra_form.is_valid()):
             with transaction.atomic():
@@ -57,17 +56,12 @@ def profile_edit(request):
                     ex.save()
                 user.profile_status = User.ProfileStatus.PENDING_REVIEW
                 user.save(update_fields=["profile_status"])
-                if media_form.is_valid() and media_form.cleaned_data.get("image"):
-                    m = media_form.save(commit=False)
-                    m.profile = profile
-                    m.save()
             messages.success(request, "تم حفظ الاستمارة وهي الآن قيد مراجعة المشرف.")
             return redirect("home")
         err_parts = []
         for fname, elist in form.errors.items():
-            label = fname
             for msg in elist:
-                err_parts.append(f"{label}: {msg}")
+                err_parts.append(f"{fname}: {msg}")
         if extra_form is not None:
             for fname, elist in extra_form.errors.items():
                 for msg in elist:
@@ -87,7 +81,6 @@ def profile_edit(request):
             else:
                 b, _ = BrideExtendedProfile.objects.get_or_create(profile=profile)
                 extra_form = BrideExtraForm(instance=b)
-        media_form = ProfileMediaForm()
 
     return render(
         request,
@@ -95,7 +88,6 @@ def profile_edit(request):
         {
             "form": form,
             "extra_form": extra_form,
-            "media_form": media_form,
             "profile": profile,
         },
     )
@@ -108,9 +100,7 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
     pk_url_kwarg = "pk"
 
     def get_queryset(self):
-        return User.objects.select_related("applicant_profile").prefetch_related(
-            "applicant_profile__media_items",
-        )
+        return User.objects.select_related("applicant_profile")
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)

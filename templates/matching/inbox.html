@@ -1,29 +1,49 @@
 {% extends "base.html" %}
-{% block title %}صندوق الطلبات{% endblock %}
+{% block title %}الطلبات{% endblock %}
 {% block content %}
 <div class="card">
-  <h1>واردة</h1>
-  <ul>
-    {% for i in incoming %}
-      <li>
-        من {% if i.requester.applicant_profile %}{{ i.requester.applicant_profile.full_name|slice:":1" }}***{% else %}{{ i.requester.email }}{% endif %} — {{ i.get_status_display }}
-        {% if i.status == "pending" %}
-          <form method="post" action="{% url 'accept_intro' i.pk %}" style="display:inline;">{% csrf_token %}<button type="submit">قبول</button></form>
-        {% endif %}
-      </li>
-    {% empty %}
-      <li>لا يوجد.</li>
-    {% endfor %}
-  </ul>
+  <h1 style="margin-top:0;">طلبات الرؤية الشرعية</h1>
+  <p class="muted">الواردة تحتاج موافقتك أحياناً؛ الصادرة تظهر حالة طلبك لدى الطرف الآخر.</p>
 </div>
-<div class="card">
-  <h1>صادرة</h1>
-  <ul>
-    {% for i in outgoing %}
-      <li>إلى {% if i.recipient.applicant_profile %}{{ i.recipient.applicant_profile.full_name|slice:":1" }}***{% else %}{{ i.recipient.email }}{% endif %} — {{ i.get_status_display }}</li>
+
+<div class="inbox-grid">
+  <section class="inbox-column card">
+    <h2 class="col-title">واردة</h2>
+    {% for i in incoming %}
+      <div class="request-item">
+        <div class="row-top">
+          <span class="who">من {% if i.requester.applicant_profile %}{{ i.requester.applicant_profile.full_name|slice:":1" }}•••{% else %}{{ i.requester.email }}{% endif %}</span>
+          <span class="badge">{{ i.get_status_display }}</span>
+        </div>
+        {% if i.message %}
+          <p class="muted" style="margin:0.4rem 0 0;font-size:0.88rem;">{{ i.message|truncatewords:20 }}</p>
+        {% endif %}
+        {% if i.status == "pending" %}
+          <div class="actions">
+            <form method="post" action="{% url 'accept_intro' i.pk %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-sm">قبول الطلب</button></form>
+          </div>
+        {% endif %}
+      </div>
     {% empty %}
-      <li>لا يوجد.</li>
+      <p class="muted" style="margin:0;">لا توجد طلبات واردة.</p>
     {% endfor %}
-  </ul>
+  </section>
+
+  <section class="inbox-column card">
+    <h2 class="col-title">صادرة</h2>
+    {% for i in outgoing %}
+      <div class="request-item">
+        <div class="row-top">
+          <span class="who">إلى {% if i.recipient.applicant_profile %}{{ i.recipient.applicant_profile.full_name|slice:":1" }}•••{% else %}{{ i.recipient.email }}{% endif %}</span>
+          <span class="badge">{{ i.get_status_display }}</span>
+        </div>
+        {% if i.message %}
+          <p class="muted" style="margin:0.4rem 0 0;font-size:0.88rem;">{{ i.message|truncatewords:20 }}</p>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="muted" style="margin:0;">لا توجد طلبات صادرة.</p>
+    {% endfor %}
+  </section>
 </div>
 {% endblock %}

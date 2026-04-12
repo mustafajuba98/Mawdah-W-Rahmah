@@ -1,45 +1,94 @@
 {% extends "base.html" %}
-{% block title %}تصفح{% endblock %}
+{% block title %}تصفح الملفات{% endblock %}
 {% block content %}
-<div class="card">
-  <h1>تصفح الملفات</h1>
-  <form method="get" class="card" style="margin-bottom:1rem;">
-    <label>محافظة
-      <select name="governorate">
-        <option value="">— الكل —</option>
-        {% for val,label in governorate_choices %}
-          <option value="{{ val }}" {% if filters.governorate == val %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
-    </label>
-    <label>تعليم
-      <select name="education">
-        <option value="">—</option>
-        <option value="none" {% if filters.education == "none" %}selected{% endif %}>بدون مؤهل</option>
-        <option value="university" {% if filters.education == "university" %}selected{% endif %}>جامعي</option>
-      </select>
-    </label>
-    <label>عمر من <input name="age_min" type="number" value="{{ filters.age_min }}"></label>
-    <label>عمر إلى <input name="age_max" type="number" value="{{ filters.age_max }}"></label>
-    <button type="submit">تصفية</button>
-  </form>
-  <ul>
+<div class="browse-shell">
+  <div class="filter-panel">
+    <h1>تصفح الملفات</h1>
+    <p class="filter-desc">صفِّ حسب المحافظة والتعليم والعمر، ثم اضغط «تطبيق التصفية».</p>
+    <form method="get" id="browse-filters">
+      <div class="filter-grid">
+        <label>المحافظة
+          <select name="governorate">
+            <option value="">— الكل —</option>
+            {% for val,label in governorate_choices %}
+              <option value="{{ val }}" {% if filters.governorate == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>المؤهل
+          <select name="education">
+            <option value="">— الكل —</option>
+            <option value="none" {% if filters.education == "none" %}selected{% endif %}>بدون مؤهل</option>
+            <option value="below_avg" {% if filters.education == "below_avg" %}selected{% endif %}>متوسط</option>
+            <option value="above_avg" {% if filters.education == "above_avg" %}selected{% endif %}>فوق المتوسط</option>
+            <option value="university" {% if filters.education == "university" %}selected{% endif %}>جامعي</option>
+            <option value="postgrad" {% if filters.education == "postgrad" %}selected{% endif %}>دراسات عليا</option>
+          </select>
+        </label>
+        <label>الحالة الاجتماعية
+          <select name="marital_status">
+            <option value="">— الكل —</option>
+            <option value="single" {% if filters.marital_status == "single" %}selected{% endif %}>أعزب/عزباء</option>
+            <option value="engaged" {% if filters.marital_status == "engaged" %}selected{% endif %}>سبق عقد/كتب كتاب</option>
+            <option value="divorced" {% if filters.marital_status == "divorced" %}selected{% endif %}>مطلق/مطلقة</option>
+            <option value="widowed" {% if filters.marital_status == "widowed" %}selected{% endif %}>أرمل/أرملة</option>
+            <option value="polygamy" {% if filters.marital_status == "polygamy" %}selected{% endif %}>متزوج (تعدد)</option>
+          </select>
+        </label>
+        <label>عمر من
+          <input name="age_min" type="number" min="18" max="90" placeholder="مثال 22" value="{{ filters.age_min }}">
+        </label>
+        <label>عمر إلى
+          <input name="age_max" type="number" min="18" max="90" placeholder="مثال 35" value="{{ filters.age_max }}">
+        </label>
+      </div>
+      <div class="filter-actions">
+        <button type="submit" class="btn">تطبيق التصفية</button>
+        <a class="btn btn-ghost" href="{% url 'browse' %}">مسح الفلاتر</a>
+      </div>
+    </form>
+  </div>
+
+  <div class="feed-list">
     {% for u in users %}
-      <li>
-        <a href="{% url 'profile_detail' u.pk %}">{{ u.applicant_profile.full_name|slice:":1" }}*** — {{ u.applicant_profile.get_governorate_display_ar }} — عمر {{ u.applicant_profile.age }}</a>
-      </li>
+      {% with p=u.applicant_profile %}
+      <article class="profile-card">
+        <div class="profile-card-head">
+          <div class="profile-card-avatar">{{ p.full_name|slice:":1" }}</div>
+          <div class="profile-card-meta">
+            <h2>{{ p.full_name|slice:":1" }}•••</h2>
+            <p class="sub">{{ p.get_governorate_display_ar }} · العمر {{ p.age }} · {{ p.get_education_display }}</p>
+          </div>
+        </div>
+        <div class="profile-card-body">
+          {% if p.partner_specs %}
+            <p class="excerpt">{{ p.partner_specs|truncatewords:28 }}</p>
+          {% elif p.about_me %}
+            <p class="excerpt">{{ p.about_me|truncatewords:28 }}</p>
+          {% else %}
+            <p class="excerpt muted">ملف مفعّل — اضغط لعرض التفاصيل المتاحة لك.</p>
+          {% endif %}
+        </div>
+        <div class="profile-card-foot">
+          <a class="btn btn-sm" href="{% url 'profile_detail' u.pk %}">عرض الملف</a>
+        </div>
+      </article>
+      {% endwith %}
     {% empty %}
-      <li>لا توجد نتائج.</li>
+      <div class="card">
+        <p class="muted" style="margin:0;">لا توجد ملفات تطابق التصفية الحالية.</p>
+      </div>
     {% endfor %}
-  </ul>
+  </div>
+
   {% if is_paginated %}
-    <p class="muted">
+    <p class="pagination-bar">
       {% if page_obj.has_previous %}
-        <a href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v }}&amp;{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">السابق</a>
+        <a href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v }}&amp;{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">← السابق</a>
       {% endif %}
-      — صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }} —
+      صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}
       {% if page_obj.has_next %}
-        <a href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v }}&amp;{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">التالي</a>
+        <a href="?{% for k,v in request.GET.items %}{% if k != 'page' %}{{ k }}={{ v }}&amp;{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">التالي →</a>
       {% endif %}
     </p>
   {% endif %}

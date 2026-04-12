@@ -1,43 +1,60 @@
 {% extends "base.html" %}
-{% block title %}الإشراف{% endblock %}
+{% block title %}لوحة الإشراف{% endblock %}
 {% block content %}
-<div class="card">
-  <h1>ملفات بانتظار المراجعة</h1>
-  <ul>
-    {% for u in pending_users %}
-      <li>
-        {{ u.email }} — {{ u.applicant_profile.full_name }}
-        <a class="btn" href="{% url 'moderation_approve_profile' u.pk %}">تفعيل</a>
-        <a class="btn btn-secondary" href="{% url 'moderation_reject_profile' u.pk %}">رفض</a>
-      </li>
-    {% empty %}
-      <li>لا يوجد.</li>
-    {% endfor %}
-  </ul>
+<div class="card dash-highlight">
+  <h1 style="margin-top:0;">لوحة الإشراف</h1>
+  <p class="muted">راجع الاستمارات الجديدة وطلبات الرؤية قبل أن يتصل الأعضاء ببعضهم.</p>
 </div>
-<div class="card">
-  <h1>طلبات رؤية بانتظار المشرف</h1>
-  <ul>
-    {% for i in pending_intros %}
-      <li>
-        {{ i.requester.email }} → {{ i.recipient.email }}
-        <a class="btn" href="{% url 'moderation_decide_intro' i.pk %}">قرار</a>
-      </li>
-    {% empty %}
-      <li>لا يوجد.</li>
-    {% endfor %}
-  </ul>
+
+<div class="mod-section card">
+  <h2>ملفات بانتظار المراجعة</h2>
+  {% for u in pending_users %}
+    <div class="mod-row">
+      <div class="meta">
+        <strong>{{ u.applicant_profile.full_name }}</strong><br>
+        <span class="muted">{{ u.email }}</span>
+      </div>
+      <div class="actions">
+        <a class="btn btn-sm" href="{% url 'moderation_approve_profile' u.pk %}">تفعيل</a>
+        <a class="btn btn-sm btn-secondary" href="{% url 'moderation_reject_profile' u.pk %}">رفض</a>
+      </div>
+    </div>
+  {% empty %}
+    <p class="muted" style="margin:0;">لا يوجد ملفات في الانتظار.</p>
+  {% endfor %}
 </div>
+
+<div class="mod-section card">
+  <h2>طلبات رؤية بانتظار قرارك</h2>
+  {% for i in pending_intros %}
+    <div class="mod-row">
+      <div class="meta">
+        <strong>{{ i.requester.email }}</strong>
+        <span class="muted"> ← </span>
+        <strong>{{ i.recipient.email }}</strong>
+      </div>
+      <div class="actions">
+        <a class="btn btn-sm" href="{% url 'moderation_decide_intro' i.pk %}">اتخاذ قرار</a>
+      </div>
+    </div>
+  {% empty %}
+    <p class="muted" style="margin:0;">لا توجد طلبات معلّقة.</p>
+  {% endfor %}
+</div>
+
 {% if is_platform_admin %}
-<div class="card">
-  <h1>حسابات مفعّلة — إيقاف (مسؤول المنصة)</h1>
-  <ul>
-    {% for u in active_for_suspend %}
-      <li>{{ u.email }} <a class="btn btn-secondary" href="{% url 'moderation_suspend_user' u.pk %}">إيقاف</a></li>
-    {% empty %}
-      <li>لا يوجد.</li>
-    {% endfor %}
-  </ul>
+<div class="mod-section card">
+  <h2>حسابات مفعّلة — إيقاف (مسؤول المنصة)</h2>
+  {% for u in active_for_suspend %}
+    <div class="mod-row">
+      <div class="meta">{{ u.email }}</div>
+      <div class="actions">
+        <a class="btn btn-sm btn-secondary" href="{% url 'moderation_suspend_user' u.pk %}">إيقاف الحساب</a>
+      </div>
+    </div>
+  {% empty %}
+    <p class="muted" style="margin:0;">لا يوجد.</p>
+  {% endfor %}
 </div>
 {% endif %}
 {% endblock %}

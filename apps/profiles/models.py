@@ -123,26 +123,3 @@ class BrideExtendedProfile(models.Model):
     class Meta:
         verbose_name = "بيانات إضافية (عروس)"
 
-
-class ProfileMedia(models.Model):
-    class ReviewStatus(models.TextChoices):
-        PENDING = "pending", "قيد المراجعة"
-        APPROVED = "approved", "مقبول"
-        REJECTED = "rejected", "مرفوض"
-
-    profile = models.ForeignKey(
-        ApplicantProfile,
-        on_delete=models.CASCADE,
-        related_name="media_items",
-    )
-    image = models.ImageField(upload_to="profiles/%Y/%m/")
-    review_status = models.CharField(
-        max_length=16,
-        choices=ReviewStatus.choices,
-        default=ReviewStatus.PENDING,
-    )
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = "مرفق ملف"
-        verbose_name_plural = "مرفقات الملفات"

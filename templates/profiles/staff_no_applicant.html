@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 {% block title %}حساب إشراف{% endblock %}
 {% block content %}
-<div class="card">
-  <h1>لوحة العمل — إشراف</h1>
-  <p class="muted">هذا الحساب مخصّص للإشراف ولا يحتاج استمارة تعارف كعضو. إن أردت تجربة الموقع كمستخدم، أنشئ حساباً عادياً من التسجيل مع اختيار نوع مقدّم الطلب.</p>
-  <p><a class="btn" href="{% url 'moderation_home' %}">الانتقال إلى الإشراف</a></p>
-  <p><a class="btn btn-secondary" href="/admin/">لوحة Django الإدارية</a></p>
+<div class="card dash-highlight">
+  <h1 style="margin-top:0;">حساب إشراف</h1>
+  <p class="muted">هذا الحساب مخصّص للإشراف ولا يحتاج استمارة تعارف كعضو. لتجربة الموقع كمستخدم، أنشئ حساباً عادياً من التسجيل مع اختيار نوع مقدّم الطلب.</p>
+  <p>
+    <a class="btn" href="{% url 'moderation_home' %}">لوحة الإشراف</a>
+    {% if user.is_superuser %}
+    <a class="btn btn-secondary" href="/admin/">إدارة Django (سوبر يوزر)</a>
+    {% endif %}
+  </p>
 </div>
 {% endblock %}

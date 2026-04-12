@@ -2,18 +2,25 @@
 {% block title %}المحادثات{% endblock %}
 {% block content %}
 <div class="card">
-  <h1>محادثاتك</h1>
-  <ul>
-    {% for c in conversations %}
-      <li>
-        <a href="{% url 'conversation_room' c.pk %}">
-          {% if c.user_a_id == user.id %}مع {{ c.user_b.email }}{% else %}مع {{ c.user_a.email }}{% endif %}
-        </a>
-      </li>
-    {% endfor %}
-  </ul>
-  {% if not conversations %}
-    <p class="muted">لا توجد محادثات بعد موافقة المشرف على طلب رؤية.</p>
-  {% endif %}
+  <h1 style="margin-top:0;">محادثاتك</h1>
+  <p class="muted">تفتح المحادثة بعد موافقة المشرف على طلب الرؤية الشرعية.</p>
+</div>
+<div class="conv-list">
+  {% for c in conversations %}
+    <a class="conv-row" href="{% url 'conversation_room' c.pk %}">
+      <div class="av">
+        {% if c.user_a_id == user.id %}{{ c.user_b.email|slice:":1"|upper }}{% else %}{{ c.user_a.email|slice:":1"|upper }}{% endif %}
+      </div>
+      <div class="txt">
+        <strong>
+          {% if c.user_a_id == user.id %}محادثة مع {{ c.user_b.email }}{% else %}محادثة مع {{ c.user_a.email }}{% endif %}
+        </strong>
+        <span>اضغط للدخول إلى الرسائل</span>
+      </div>
+      <span class="chev">‹</span>
+    </a>
+  {% empty %}
+    <div class="card"><p class="muted" style="margin:0;">لا توجد محادثات بعد.</p></div>
+  {% endfor %}
 </div>
 {% endblock %}

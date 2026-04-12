@@ -21,3 +21,9 @@ Copy `.env.example` to `.env` if you use environment variables.
 ## Roles
 
 After `setup_roles`, assign users to Django groups `moderator` or `platform_admin` in the admin site.
+
+**Django `/admin/`** is restricted to **superusers only** (middleware). Moderators use **`/moderation/`** in the app.
+
+Profile photos are not stored in-app (no uploads) to keep hosting light.
+
+Run `python manage.py collectstatic` when `DEBUG=False` so `static/css/app.css` is served.

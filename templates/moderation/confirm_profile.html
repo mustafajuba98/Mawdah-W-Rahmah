@@ -3,7 +3,7 @@
 <div class="card">
   <h1>{% if action == "approve" %}تفعيل الملف{% else %}رفض الملف{% endif %}</h1>
   <p>{{ target_user.email }}</p>
-  <form method="post">{% csrf_token %}<button type="submit">تأكيد</button></form>
+  <form method="post">{% csrf_token %}<button type="submit" class="btn">تأكيد</button></form>
   <a class="btn btn-secondary" href="{% url 'moderation_home' %}">رجوع</a>
 </div>
 {% endblock %}

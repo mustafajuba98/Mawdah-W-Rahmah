@@ -2,14 +2,14 @@
 {% block title %}طلب رؤية{% endblock %}
 {% block content %}
 <div class="card">
-  <h1>طلب رؤية شرعية</h1>
-  <p>إلى: {{ recipient.applicant_profile.full_name|slice:":1" }}***</p>
+  <h1 style="margin-top:0;">طلب رؤية شرعية</h1>
+  <p class="muted">إلى: {{ recipient.applicant_profile.full_name|slice:":1" }}•••</p>
   <form method="post">
     {% csrf_token %}
     <label>رسالة مختصرة (اختياري)
-      <textarea name="message" rows="4" maxlength="2000"></textarea>
+      <textarea name="message" rows="4" maxlength="2000" placeholder="كلمة طيبة أو تعريف مختصر…"></textarea>
     </label>
-    <button type="submit">إرسال الطلب</button>
+    <button type="submit" class="btn">إرسال الطلب</button>
     <a class="btn btn-secondary" href="{% url 'browse' %}">إلغاء</a>
   </form>
 </div>

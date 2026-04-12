@@ -1,13 +1,9 @@
 from django import forms
-from django.core.exceptions import ValidationError
 
 from apps.accounts.models import User
 
 from .constants import EGYPT_GOVERNORATES
-from .models import ApplicantProfile, BrideExtendedProfile, GroomExtendedProfile, ProfileMedia
-
-# حد أقصى للصورة مناسب للاستضافة المجانية (يمكن تغييره لاحقاً مع تخزين سحابي)
-MAX_PROFILE_IMAGE_BYTES = 2 * 1024 * 1024  # 2 ميجابايت
+from .models import ApplicantProfile, BrideExtendedProfile, GroomExtendedProfile
 
 
 class ApplicantProfileForm(forms.ModelForm):
@@ -94,30 +90,3 @@ class BrideExtraForm(forms.ModelForm):
         for _name, field in self.fields.items():
             if isinstance(field, forms.BooleanField):
                 field.required = False
-
-
-class ProfileMediaForm(forms.ModelForm):
-    class Meta:
-        model = ProfileMedia
-        fields = ("image",)
-        labels = {"image": "صورة شخصية (اختياري)"}
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["image"].required = False
-        self.fields["image"].help_text = (
-            f"بحد أقصى {MAX_PROFILE_IMAGE_BYTES // (1024 * 1024)} ميجابايت، صور فقط."
-        )
-
-    def clean_image(self):
-        f = self.cleaned_data.get("image")
-        if not f:
-            return f
-        if hasattr(f, "size") and f.size > MAX_PROFILE_IMAGE_BYTES:
-            raise ValidationError(
-                "حجم الصورة كبير جداً. قلّل الحجم أو ارفع صورة أصغر (الحد الأقصى 2 ميجابايت).",
-            )
-        ct = getattr(f, "content_type", "") or ""
-        if ct and not ct.startswith("image/"):
-            raise ValidationError("يُسمح برفع ملفات الصور فقط.")
-        return f

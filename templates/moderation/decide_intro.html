@@ -6,8 +6,8 @@
   <form method="post">
     {% csrf_token %}
     <label>ملاحظات<textarea name="notes" rows="3"></textarea></label>
-    <button type="submit" name="decision" value="approve">موافقة وفتح التواصل</button>
-    <button type="submit" name="decision" value="reject" class="btn-secondary">رفض</button>
+    <button type="submit" name="decision" value="approve" class="btn">موافقة وفتح التواصل</button>
+    <button type="submit" name="decision" value="reject" class="btn btn-secondary">رفض</button>
   </form>
 </div>
 {% endblock %}

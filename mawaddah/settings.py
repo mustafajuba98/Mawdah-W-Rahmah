@@ -1,20 +1,107 @@
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
-
-load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-change-in-production")
-DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
+load_dotenv(BASE_DIR / ".env")
 
-ALLOWED_HOSTS = [
-    h.strip()
-    for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-    if h.strip()
+
+def _env(name: str) -> str:
+    if name not in os.environ:
+        raise ImproperlyConfigured(
+            f"Required environment variable is missing: {name}. Add it to .env"
+        )
+    return os.environ[name]
+
+
+def _env_bool(name: str) -> bool:
+    v = _env(name).strip().lower()
+    if v in ("1", "true", "yes", "on"):
+        return True
+    if v in ("0", "false", "no", "off"):
+        return False
+    raise ImproperlyConfigured(
+        f"{name} must be a boolean (true/false); got {v!r}"
+    )
+
+
+def _env_int(name: str) -> int:
+    raw = _env(name).strip()
+    try:
+        return int(raw)
+    except ValueError as e:
+        raise ImproperlyConfigured(f"{name} must be an integer") from e
+
+
+def _env_csv(name: str) -> list[str]:
+    return [x.strip() for x in _env(name).split(",") if x.strip()]
+
+
+def _env_path(name: str) -> Path:
+    raw = _env(name).strip()
+    p = Path(raw)
+    if p.is_absolute():
+        return p
+    return BASE_DIR / p
+
+
+def _path_from_value(raw: str) -> Path:
+    raw = raw.strip()
+    p = Path(raw)
+    if p.is_absolute():
+        return p
+    return BASE_DIR / p
+
+
+# All values below come from .env only (no fallbacks in code).
+
+SECRET_KEY = _env("DJANGO_SECRET_KEY")
+DEBUG = _env_bool("DJANGO_DEBUG")
+ALLOWED_HOSTS = _env_csv("DJANGO_ALLOWED_HOSTS")
+CSRF_TRUSTED_ORIGINS = _env_csv("DJANGO_CSRF_TRUSTED_ORIGINS")
+# Read from .env; applied only when DEBUG is False (avoids redirect issues with runserver).
+_SECURE_SSL_REDIRECT_ENV = _env_bool("DJANGO_SECURE_SSL_REDIRECT")
+
+LANGUAGE_CODE = _env("DJANGO_LANGUAGE_CODE")
+TIME_ZONE = _env("DJANGO_TIME_ZONE")
+USE_I18N = _env_bool("DJANGO_USE_I18N")
+USE_TZ = _env_bool("DJANGO_USE_TZ")
+
+EMAIL_BACKEND = _env("DJANGO_EMAIL_BACKEND")
+
+DATABASES = {
+    "default": {
+        "ENGINE": _env("DJANGO_DATABASE_ENGINE"),
+        "NAME": _env_path("DJANGO_DATABASE_NAME"),
+    }
+}
+
+STATIC_URL = _env("DJANGO_STATIC_URL")
+MEDIA_URL = _env("DJANGO_MEDIA_URL")
+STATIC_ROOT = _env_path("DJANGO_STATIC_ROOT")
+MEDIA_ROOT = _env_path("DJANGO_MEDIA_ROOT")
+STATICFILES_DIRS = [
+    _path_from_value(p)
+    for p in _env("DJANGO_STATICFILES_DIRS").split(",")
+    if p.strip()
 ]
+
+LOGIN_REDIRECT_URL = _env("DJANGO_LOGIN_REDIRECT_URL")
+LOGOUT_REDIRECT_URL = _env("DJANGO_LOGOUT_REDIRECT_URL")
+LOGIN_URL = _env("DJANGO_LOGIN_URL")
+
+SESSION_COOKIE_HTTPONLY = _env_bool("DJANGO_SESSION_COOKIE_HTTPONLY")
+CSRF_COOKIE_HTTPONLY = _env_bool("DJANGO_CSRF_COOKIE_HTTPONLY")
+SECURE_BROWSER_XSS_FILTER = _env_bool("DJANGO_SECURE_BROWSER_XSS_FILTER")
+X_FRAME_OPTIONS = _env("DJANGO_X_FRAME_OPTIONS")
+
+SECURE_HSTS_SECONDS = _env_int("DJANGO_SECURE_HSTS_SECONDS")
+SECURE_HSTS_INCLUDE_SUBDOMAINS = _env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS")
+
+# App structure (fixed in code).
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -62,14 +149,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "mawaddah.wsgi.application"
 
-# SQLite only (per product choice)
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -77,38 +156,19 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-LANGUAGE_CODE = "ar"
-TIME_ZONE = "Africa/Cairo"
-USE_I18N = True
-USE_TZ = True
-
-STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
-MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "accounts.User"
 
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "home"
-LOGIN_URL = "login"
-
-# Security-oriented defaults (tighten when DEBUG=False behind HTTPS)
-SESSION_COOKIE_HTTPONLY = True
-CSRF_COOKIE_HTTPONLY = True
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = "DENY"
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    USE_X_FORWARDED_HOST = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    SECURE_SSL_REDIRECT = _SECURE_SSL_REDIRECT_ENV
+else:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_SSL_REDIRECT = False
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [

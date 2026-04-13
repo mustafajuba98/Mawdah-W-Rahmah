@@ -9,9 +9,8 @@ from django.views.generic import TemplateView
 from services.landing_prayer import fetch_prayer_timings_cached
 from services.landing_spiritual import build_spirit_cards
 
-WHATSAPP_COMMUNITY_URL = (
-    "https://chat.whatsapp.com/IF2rhhDw98h6W30pfjbBcP?mode=gi_t"
-)
+# دعوة مجموعة — بدون query params (أحياناً ?mode= يفتح واتساب ويب/تسجيل بدل التطبيق)
+WHATSAPP_COMMUNITY_URL = "https://chat.whatsapp.com/IF2rhhDw98h6W30pfjbBcP"
 FACEBOOK_GROUP_URL = (
     "https://www.facebook.com/groups/1327870227876229/"
     "?ref=share_group_link&rdid=ylPngkRTd61XKNtL"

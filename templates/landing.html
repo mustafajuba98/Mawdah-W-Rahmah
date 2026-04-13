@@ -1,12 +1,34 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}مودة ورحمة — للتعارف الشرعي{% endblock %}
+{% block extra_head %}
+<link rel="canonical" href="{{ site_canonical }}/" />
+<meta name="description" content="منصة مودة ورحمة للتعارف الشرعي بقصد الزواج، بإشراف فريق وخصوصية للبيانات." />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="ar_AR" />
+<meta property="og:title" content="مودة ورحمة — للتعارف الشرعي" />
+<meta property="og:description" content="تسجيل، تحقق من البريد، استمارة، مراجعة إشراف — مسار واضح بإذن الله." />
+<meta property="og:url" content="{{ site_canonical }}/" />
+{% if og_image_url %}
+<meta property="og:image" content="{{ og_image_url }}" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="مودة ورحمة" />
+<meta name="twitter:description" content="تعارف شرعي بإشراف فريق." />
+<meta name="twitter:image" content="{{ og_image_url }}" />
+{% endif %}
+{% endblock %}
 {% block main_class %}landing-main{% endblock %}
 {% block content %}
 <div class="landing">
   <header class="landing-hero">
     <div class="landing-hero-inner">
-      <p class="landing-kicker">بإشراف فريق · تعارف شرعي</p>
-      <h1>مودة ورحمة</h1>
+      <div class="landing-hero-brand">
+        <img class="landing-hero-logo" src="{% static 'img/brand-mosque.svg' %}" width="72" height="72" alt="" />
+        <div>
+          <p class="landing-kicker">بإشراف فريق · تعارف شرعي</p>
+          <h1>مودة ورحمة</h1>
+        </div>
+      </div>
       <p class="landing-lead">
         منصة هادئة للتعارف بقصد الزواج، بضوابط شرعية وخصوصية للبيانات الحساسة.
         نسأل الله التوفيق والبركة في الخطوة.
@@ -15,13 +37,28 @@
         <a class="btn btn-hero" href="{% url 'signup' %}">إنشاء حساب</a>
         <a class="btn btn-hero-outline" href="{% url 'login' %}">تسجيل الدخول</a>
       </div>
-      <p class="landing-hero-note muted small">ولا تنسَ ذكر الله ومواقيت الصلاة أسفل الصفحة</p>
+      <p class="landing-hero-note muted small">ذكر الله ومواقيت الصلاة والمجتمع أسفل الصفحة</p>
     </div>
     <div class="landing-hero-art" aria-hidden="true">
       <span class="landing-moon">☽</span>
       <span class="landing-stars">✦ ✦ ✦</span>
     </div>
   </header>
+
+  <section class="landing-section landing-how" id="how-it-works">
+    <div class="landing-section-inner">
+      <h2><span class="landing-ico" aria-hidden="true">📋</span> كيف تعمل المنصة؟</h2>
+      <p class="section-intro muted">مسار مختصر — قد تختلف التفاصيل حسب حالة حسابك.</p>
+      <ol class="landing-steps">
+        <li><strong>التسجيل</strong> ببريد معروف وكلمة مرور، مع اختيار نوع مقدّم الطلب.</li>
+        <li><strong>التحقق من البريد</strong> بإدخال الرمز المرسل إلى بريدك لتفعيل الحساب.</li>
+        <li><strong>استمارة الملف</strong> لإكمال البيانات الشرعية المطلوبة للمراجعة.</li>
+        <li><strong>مراجعة الإشراف</strong> على الاستمارة قبل تفعيل التصفح أو الخطوات التالية.</li>
+        <li><strong>طلبات الرؤية الشرعية</strong> والموافقات حسب ضوابط المنصة.</li>
+        <li><strong>التواصل</strong> داخل المنصة بعد الموافقات — دون عرض بيانات حساسة قبل أوانها.</li>
+      </ol>
+    </div>
+  </section>
 
   <section class="landing-section landing-values" id="about">
     <div class="landing-section-inner">
@@ -38,6 +75,30 @@
         <article class="landing-card">
           <h3>الهدوء</h3>
           <p class="muted">تجربة بسيطة بعيداً عن الإزعاج والتشتيت.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-section landing-trust" id="trust">
+    <div class="landing-section-inner">
+      <h2><span class="landing-ico" aria-hidden="true">🛡️</span> ثقة وإشراف</h2>
+      <p class="section-intro muted">بدون صور أشخاص — نصوص واضحة وهوية بصرية خفيفة.</p>
+      <div class="landing-trust-grid">
+        <article class="landing-trust-card">
+          <img src="{% static 'img/brand-mosque.svg' %}" width="56" height="56" alt="" class="landing-trust-icon" />
+          <h3>بإشراف فريق</h3>
+          <p class="muted">مسار المراجعة يمر عبر لوحة إشراف قبل تفعيل التصفح أو التواصل الحساس.</p>
+        </article>
+        <article class="landing-trust-card">
+          <span class="landing-trust-emoji" aria-hidden="true">🕌</span>
+          <h3>التزام بالحدود الشرعية</h3>
+          <p class="muted">الهدف الزواج الحلال؛ التعارف عبر الضوابط المعتمدة في المنصة.</p>
+        </article>
+        <article class="landing-trust-card">
+          <span class="landing-trust-emoji" aria-hidden="true">🔒</span>
+          <h3>خصوصية البيانات</h3>
+          <p class="muted">لا تُعرض أرقام أو صور أو تفاصيل حساسة إلا بعد الموافقات المناسبة.</p>
         </article>
       </div>
     </div>
@@ -67,7 +128,9 @@
   <section class="landing-section landing-prayer" id="prayer">
     <div class="landing-section-inner">
       <h2><span class="landing-ico" aria-hidden="true">🕋</span> مواقيت الصلاة</h2>
-      <p class="section-intro muted">اليوم — القاهرة، مصر (تقريب حسب الهيئة المصرية). المصدر: خدمة عامة للمواقيت.</p>
+      <p class="section-intro muted">
+        اليوم — <strong>{{ prayer_place }}</strong> (تقريب عبر خدمة Aladhan). تُحدَّث النتيجة في الخادم كل فترة لتقليل الطلبات الخارجية.
+      </p>
       {% if prayer and prayer.rows %}
       <div class="landing-prayer-meta muted small">
         {% if prayer.gregorian %}<span>{{ prayer.gregorian }}</span>{% endif %}
@@ -89,15 +152,16 @@
 
   <section class="landing-section landing-spirit" id="adhkar">
     <div class="landing-section-inner">
-      <h2><span class="landing-ico" aria-hidden="true">📿</span> آيات وأذكار</h2>
+      <h2><span class="landing-ico" aria-hidden="true">📿</span> آيات وأحاديث وأذكار</h2>
       <p class="section-intro muted">
-        يتغيّر المحتوى عند كل تحديث للصفحة: آيات عشوائية من خدمة عامة للقرآن،
-        مع أذكار مختصرة من السنة — ردّد بوقار وتحقق من الصيغ في كتب الأذكار المعتمدة.
+        يتغيّر المحتوى عند تحديث الصفحة: <strong>آية عشوائية</strong> من Al Quran Cloud،
+        و<strong>حديث عربي</strong> من مصدر jsDelivr (مشروع hadith-api)، مع <strong>أذكار</strong> مختصرة من السنة.
+        رجاء المراجعة في الكتب والمراجع المعتمدة للصيغ الدقيقة.
       </p>
       <div class="landing-spirit-grid">
         {% for card in spirit_cards %}
         <article class="landing-spirit-card">
-          <span class="spirit-kind">{{ card.kind }}</span>
+          <span class="spirit-kind{% if card.kind == 'حديث' %} spirit-kind-hadith{% endif %}">{{ card.kind }}</span>
           <h3>{{ card.title }}</h3>
           {% for line in card.lines %}
           <p class="spirit-text">{{ line }}</p>
@@ -111,12 +175,51 @@
     </div>
   </section>
 
+  <section class="landing-section landing-faq" id="faq">
+    <div class="landing-section-inner">
+      <h2><span class="landing-ico" aria-hidden="true">❔</span> أسئلة شائعة</h2>
+      <div class="landing-faq-list">
+        <details class="landing-faq-item">
+          <summary>هل المنصة مجانية؟</summary>
+          <p>سياسة الاشتراك أو التبرع تُحدَّد من إدارة المنصة. راقب إعلانات المجموعة الرسمية.</p>
+        </details>
+        <details class="landing-faq-item">
+          <summary>متى أستطيع تصفّح ملفات الآخرين؟</summary>
+          <p>بعد اكتمال التحقق من البريد، وتعبئة الاستمارة، وموافقة الإشراف عندما تنطبق الشروط على حسابك.</p>
+        </details>
+        <details class="landing-faq-item">
+          <summary>هل تظهر صورتي أو رقمي للجميع؟</summary>
+          <p>لا — البيانات الحساسة لا تُعرض إلا ضمن الموافقات والضوابط المعتمدة في النظام.</p>
+        </details>
+        <details class="landing-faq-item">
+          <summary>ماذا لو لم يصلني رمز التحقق؟</summary>
+          <p>تحقق من البريد غير المرغوب (Spam)، ثم سجّل الدخول ببريدك وكلمة المرور لإعادة فتح صفحة الرمز أو طلب إعادة إرسال.</p>
+        </details>
+        <details class="landing-faq-item">
+          <summary>هل يمكنني حذف حسابي؟</summary>
+          <p>لطلب الحذف أو الاستفسار تواصل مع إدارة المنصة عبر قنوات المجتمع الرسمية.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
   <footer class="landing-footer" id="join">
     <div class="landing-section-inner landing-footer-inner">
       <h2>ابدأ بخطوة مباركة</h2>
       <p class="muted">أنشئ حساباً و أكمل التحقق من البريد ثم الاستمارة.</p>
       <a class="btn btn-hero" href="{% url 'signup' %}">تسجيل</a>
+      {% if privacy_policy_url %}
+      <p class="landing-privacy muted small" style="margin-top:1.25rem;">
+        <a href="{{ privacy_policy_url }}" rel="noopener noreferrer">سياسة الخصوصية</a>
+      </p>
+      {% else %}
+      <p class="landing-privacy muted small" style="margin-top:1.25rem;">سياسة الخصوصية: تُضاف قريباً — راقب الإعلانات الرسمية.</p>
+      {% endif %}
     </div>
   </footer>
+
+  <a class="landing-fab-wa" href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer" title="مجموعة واتساب" aria-label="فتح مجموعة واتساب مودة ورحمة">
+    <span class="landing-fab-ico" aria-hidden="true">💬</span>
+  </a>
 </div>
 {% endblock %}

@@ -87,6 +87,12 @@ SIGNUP_ALLOWED_EMAIL_DOMAINS = (
     else [x.strip().lower() for x in _signup_domains_raw.split(",") if x.strip()]
 )
 
+SITE_CANONICAL_URL = _env("DJANGO_SITE_CANONICAL_URL").strip().rstrip("/")
+PRIVACY_POLICY_URL = _env("DJANGO_PRIVACY_POLICY_URL").strip()
+PRAYER_CITY = _env("DJANGO_PRAYER_CITY").strip()
+PRAYER_COUNTRY = _env("DJANGO_PRAYER_COUNTRY").strip()
+PRAYER_CACHE_SECONDS = _env_int("DJANGO_PRAYER_CACHE_SECONDS")
+
 DATABASES = {
     "default": {
         "ENGINE": _env("DJANGO_DATABASE_ENGINE"),

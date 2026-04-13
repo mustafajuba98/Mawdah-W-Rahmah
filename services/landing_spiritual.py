@@ -11,6 +11,15 @@ logger = logging.getLogger(__name__)
 
 ALQURAN_RANDOM_AYAH = "https://api.alquran.cloud/v1/ayah/random"
 
+# Arabic editions via jsDelivr (fawazahmed0/hadith-api) — one JSON file = one «bundle» number.
+HADITH_API_BASE = (
+    "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions"
+)
+HADITH_BOOKS_MAX = (
+    ("ara-bukhari", 7563),
+    ("ara-muslim", 7000),
+)
+
 # Short authentic-style reminders (not a full Hisnul Muslim dump — point users to books).
 _STATIC_POOL: list[dict] = [
     {
@@ -98,6 +107,43 @@ _STATIC_POOL: list[dict] = [
 ]
 
 
+def _fetch_one_random_hadith() -> dict | None:
+    """Random Arabic hadith from hadith-api CDN (Bukhari or Muslim)."""
+    rng = secrets.SystemRandom()
+    for _ in range(5):
+        book, mx = rng.choice(HADITH_BOOKS_MAX)
+        n = rng.randint(1, mx)
+        url = f"{HADITH_API_BASE}/{book}/{n}.json"
+        try:
+            r = requests.get(url, timeout=12, headers={"Accept": "application/json"})
+            if r.status_code != 200:
+                continue
+            data = r.json()
+            hadiths = data.get("hadiths") or []
+            if not hadiths:
+                continue
+            h = hadiths[0]
+            text = (h.get("text") or "").strip()
+            if len(text) < 20:
+                continue
+            meta = data.get("metadata") or {}
+            book_ar = meta.get("name") or book.replace("ara-", "").title()
+            ar_num = h.get("arabicnumber") or h.get("hadithnumber") or n
+            short_book = "صحيح البخاري" if "bukhari" in book else "صحيح مسلم"
+            return {
+                "kind": "حديث",
+                "title": f"{short_book} — حديث {ar_num}",
+                "lines": [text],
+                "source": (
+                    f"النص من {book_ar} عبر مشروع hadith-api (jsDelivr) — راجع الروايات في المراجع الورقية."
+                ),
+            }
+        except Exception as exc:
+            logger.debug("Hadith fetch attempt failed: %s", exc)
+            continue
+    return None
+
+
 def _fetch_one_random_ayah() -> dict | None:
     try:
         r = requests.get(ALQURAN_RANDOM_AYAH, timeout=8, headers={"Accept": "application/json"})
@@ -121,17 +167,21 @@ def _fetch_one_random_ayah() -> dict | None:
         return None
 
 
-def build_spirit_cards(*, target: int = 6) -> list[dict]:
-    """Mix random ayahs (when API works) with shuffled static adhkar; few repeats per page load."""
+def build_spirit_cards(*, target: int = 8) -> list[dict]:
+    """Random ayah(s), one hadith when CDN responds, plus shuffled static adhkar."""
     cards: list[dict] = []
-    seen = set()
+    seen: set[str] = set()
 
     def _add(card: dict) -> None:
-        key = "|".join(card.get("lines") or [])[:200]
+        key = "|".join(card.get("lines") or [])[:240]
         if key in seen:
             return
         seen.add(key)
         cards.append(card)
+
+    h = _fetch_one_random_hadith()
+    if h:
+        _add(h)
 
     for _ in range(2):
         if len(cards) >= target:
@@ -147,4 +197,5 @@ def build_spirit_cards(*, target: int = 6) -> list[dict]:
             break
         _add(item)
 
+    secrets.SystemRandom().shuffle(cards)
     return cards[:target]

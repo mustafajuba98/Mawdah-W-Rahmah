@@ -87,39 +87,26 @@
     </div>
   </section>
 
-  <section class="landing-section landing-dhikr" id="adhkar">
+  <section class="landing-section landing-spirit" id="adhkar">
     <div class="landing-section-inner">
-      <h2><span class="landing-ico" aria-hidden="true">📿</span> أذكار مختصرة</h2>
-      <p class="section-intro muted">من السنة — ردّد بوقار ومعرفة بالمعنى قدر استطاعتك.</p>
-      <div class="landing-dhikr-grid">
-        <details class="landing-dhikr-card" open>
-          <summary>بعد الصلوات</summary>
-          <ul>
-            <li><strong>سبحان الله</strong> × ٣٣، <strong>الحمد لله</strong> × ٣٣، <strong>الله أكبر</strong> × ٣٣.</li>
-            <li>قول: <em>لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير</em> — بعد صلاة المغرب والفجر خصوصاً.</li>
-          </ul>
-        </details>
-        <details class="landing-dhikr-card">
-          <summary>صباحاً ومساءً</summary>
-          <ul>
-            <li>قراءة سورتي <strong>الإخلاص والفلق والناس</strong> ثلاث مرات بعد صلاة الفجر والمغرب.</li>
-            <li><em>أصبحنا وأصبح الملك لله…</em> و <em>أمسينا وأمسى الملك لله…</em> (من الأذكار المعروفة في الكتب المعتمدة).</li>
-          </ul>
-        </details>
-        <details class="landing-dhikr-card">
-          <summary>عند النوم</summary>
-          <ul>
-            <li>قراءة آية الكرسي، وآخر سورتين، وضرب الكف على الفراش ثلاثاً ونحوها مما ثبت في الصحيح.</li>
-            <li><em>باسمك اللهم أموت وأحيا</em>.</li>
-          </ul>
-        </details>
-        <details class="landing-dhikr-card">
-          <summary>عام</summary>
-          <ul>
-            <li><em>سبحان الله وبحمده</em> — قيل: حُطَّت خطاياه وإن كانت مثل زبد البحر.</li>
-            <li><em>لا حول ولا قوة إلا بالله</em> — كنز من كنوز الجنة.</li>
-          </ul>
-        </details>
+      <h2><span class="landing-ico" aria-hidden="true">📿</span> آيات وأذكار</h2>
+      <p class="section-intro muted">
+        يتغيّر المحتوى عند كل تحديث للصفحة: آيات عشوائية من خدمة عامة للقرآن،
+        مع أذكار مختصرة من السنة — ردّد بوقار وتحقق من الصيغ في كتب الأذكار المعتمدة.
+      </p>
+      <div class="landing-spirit-grid">
+        {% for card in spirit_cards %}
+        <article class="landing-spirit-card">
+          <span class="spirit-kind">{{ card.kind }}</span>
+          <h3>{{ card.title }}</h3>
+          {% for line in card.lines %}
+          <p class="spirit-text">{{ line }}</p>
+          {% endfor %}
+          {% if card.source %}<p class="spirit-source muted small">{{ card.source }}</p>{% endif %}
+        </article>
+        {% empty %}
+        <p class="muted">لم نتمكن من تحميل المحتوى. حاول تحديث الصفحة لاحقاً.</p>
+        {% endfor %}
       </div>
     </div>
   </section>

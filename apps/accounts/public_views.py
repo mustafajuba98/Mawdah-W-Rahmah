@@ -7,6 +7,8 @@ import logging
 import requests
 from django.views.generic import TemplateView
 
+from services.landing_spiritual import build_spirit_cards
+
 logger = logging.getLogger(__name__)
 
 ALADHAN_TIMINGS_URL = "https://api.aladhan.com/v1/timingsByCity"
@@ -87,4 +89,5 @@ class HomeView(TemplateView):
         ctx["prayer"] = fetch_prayer_timings_cairo()
         ctx["whatsapp_url"] = WHATSAPP_COMMUNITY_URL
         ctx["facebook_url"] = FACEBOOK_GROUP_URL
+        ctx["spirit_cards"] = build_spirit_cards(target=6)
         return ctx

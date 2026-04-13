@@ -150,30 +150,69 @@
     </div>
   </section>
 
-  <section class="landing-section landing-spirit" id="adhkar">
+  <section class="landing-section landing-spirit-teaser" id="adhkar">
     <div class="landing-section-inner">
-      <h2><span class="landing-ico" aria-hidden="true">📿</span> آيات وأحاديث وأذكار</h2>
-      <p class="section-intro muted">
-        يتغيّر المحتوى عند تحديث الصفحة: <strong>آية عشوائية</strong> من Al Quran Cloud،
-        و<strong>حديث عربي</strong> من مصدر jsDelivr (مشروع hadith-api)، مع <strong>أذكار</strong> مختصرة من السنة.
-        رجاء المراجعة في الكتب والمراجع المعتمدة للصيغ الدقيقة.
-      </p>
-      <div class="landing-spirit-grid">
-        {% for card in spirit_cards %}
-        <article class="landing-spirit-card">
-          <span class="spirit-kind{% if card.kind == 'حديث' %} spirit-kind-hadith{% endif %}">{{ card.kind }}</span>
-          <h3>{{ card.title }}</h3>
-          {% for line in card.lines %}
-          <p class="spirit-text">{{ line }}</p>
-          {% endfor %}
-          {% if card.source %}<p class="spirit-source muted small">{{ card.source }}</p>{% endif %}
-        </article>
-        {% empty %}
-        <p class="muted">لم نتمكن من تحميل المحتوى. حاول تحديث الصفحة لاحقاً.</p>
-        {% endfor %}
+      <div class="spirit-teaser-inner">
+        <div class="spirit-teaser-text">
+          <h2 style="margin:0 0 0.35rem;"><span class="landing-ico" aria-hidden="true">📿</span> آيات وأحاديث وأذكار</h2>
+          <p class="muted" style="margin:0;">
+            محتوى يتجدد مع كل زيارة — افتح <strong>لوحة الذكر</strong> من التبويب المثبت على الجانب أو من الزر أدناه.
+            (آية من Al Quran Cloud، حديث من hadith-api، وأذكار مختصرة — راجع المصادر المعتمدة للضبط.)
+          </p>
+        </div>
+        <button type="button" class="btn spirit-teaser-btn" data-spirit-open>
+          افتح لوحة الذكر
+        </button>
       </div>
     </div>
   </section>
+
+  <div class="spirit-drawer-root" data-spirit-drawer-root>
+    <button
+      type="button"
+      class="spirit-drawer-tab"
+      id="spirit-drawer-tab"
+      data-spirit-open
+      aria-expanded="false"
+      aria-controls="spirit-drawer-panel"
+    >
+      <span class="spirit-drawer-tab-icon" aria-hidden="true">📿</span>
+      <span class="spirit-drawer-tab-text">ذِكْر</span>
+    </button>
+    <div class="spirit-drawer-backdrop" data-spirit-close aria-hidden="true"></div>
+    <aside
+      id="spirit-drawer-panel"
+      class="spirit-drawer-panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="spirit-drawer-title"
+      aria-hidden="true"
+    >
+      <header class="spirit-drawer-head">
+        <h2 id="spirit-drawer-title"><span class="landing-ico" aria-hidden="true">📿</span> لوحة الذكر</h2>
+        <button type="button" class="spirit-drawer-close" data-spirit-close aria-label="إغلاق اللوحة">×</button>
+      </header>
+      <div class="spirit-drawer-scroll">
+        <p class="muted small spirit-drawer-intro">
+          يتغيّر عند تحديث الصفحة. رجاء المراجعة في الكتب المعتمدة للصيغ الدقيقة.
+        </p>
+        <div class="landing-spirit-grid">
+          {% for card in spirit_cards %}
+          <article class="landing-spirit-card">
+            <span class="spirit-kind{% if card.kind == 'حديث' %} spirit-kind-hadith{% endif %}">{{ card.kind }}</span>
+            <h3>{{ card.title }}</h3>
+            {% for line in card.lines %}
+            <p class="spirit-text">{{ line }}</p>
+            {% endfor %}
+            {% if card.source %}<p class="spirit-source muted small">{{ card.source }}</p>{% endif %}
+          </article>
+          {% empty %}
+          <p class="muted">لم نتمكن من تحميل المحتوى.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </aside>
+  </div>
 
   <section class="landing-section landing-faq" id="faq">
     <div class="landing-section-inner">
@@ -222,4 +261,7 @@
     <span class="landing-fab-ico" aria-hidden="true">💬</span>
   </a>
 </div>
+{% endblock %}
+{% block extra_scripts %}
+<script src="{% static 'js/spirit-drawer.js' %}" defer></script>
 {% endblock %}

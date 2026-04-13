@@ -104,6 +104,13 @@ STATICFILES_DIRS = [
     if p.strip()
 ]
 
+if not DEBUG:
+    STORAGES = {
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
+
 LOGIN_REDIRECT_URL = _env("DJANGO_LOGIN_REDIRECT_URL")
 LOGOUT_REDIRECT_URL = _env("DJANGO_LOGOUT_REDIRECT_URL")
 LOGIN_URL = _env("DJANGO_LOGIN_URL")
@@ -136,6 +143,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

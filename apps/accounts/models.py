@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.utils import timezone
 
 
 class UserManager(BaseUserManager):
@@ -26,7 +27,10 @@ class UserManager(BaseUserManager):
             raise ValueError("Superuser must have is_staff=True.")
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
-        return self._create_user(email, password, **extra_fields)
+        user = self._create_user(email, password, **extra_fields)
+        user.email_verified_at = timezone.now()
+        user.save(update_fields=["email_verified_at"])
+        return user
 
 
 class User(AbstractUser):
@@ -53,6 +57,11 @@ class User(AbstractUser):
         choices=ApplicantGender.choices,
         blank=True,
     )
+    email_verified_at = models.DateTimeField(
+        "تاريخ تأكيد البريد",
+        null=True,
+        blank=True,
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -61,3 +70,23 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class EmailVerificationPending(models.Model):
+    """Latest verification attempt for an unverified signup."""
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="email_verification_pending",
+    )
+    code_hash = models.CharField(max_length=128)
+    expires_at = models.DateTimeField()
+    last_sent_at = models.DateTimeField()
+
+    class Meta:
+        verbose_name = "رمز تأكيد بريد معلّق"
+        verbose_name_plural = "رموز تأكيد بريد معلّقة"
+
+    def is_expired(self) -> bool:
+        return timezone.now() >= self.expires_at

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}تأكيد البريد — مودة ورحمة{% endblock %}
+{% block content %}
+<div class="card verify-email-card">
+  <h1 style="margin-top:0;">تأكيد البريد الإلكتروني</h1>
+  <p class="muted">
+    أرسلنا رمزاً مكوّناً من <strong>6 أرقام</strong> إلى
+    <span class="masked-email" dir="ltr">{{ masked_email }}</span>.
+    افتح صندوق الوارد أو مجلد «العروض / Spam».
+  </p>
+  <form method="post" action="{% url 'verify_email' %}" class="verify-form">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <ul class="errorlist">{{ form.non_field_errors }}</ul>
+    {% endif %}
+    <label for="{{ form.code.id_for_label }}">{{ form.code.label }}</label>
+    {{ form.code }}
+    {% if form.code.errors %}<ul class="errorlist">{{ form.code.errors }}</ul>{% endif %}
+    <div class="form-actions" style="margin-top:1rem;">
+      <button type="submit" class="btn">تأكيد والمتابعة</button>
+    </div>
+  </form>
+  <hr class="soft-hr" />
+  <p class="muted small" style="margin:0 0 0.6rem;">لم تصلك الرسالة؟</p>
+  <form method="post" action="{% url 'resend_verification' %}" class="resend-form">
+    {% csrf_token %}
+    <button
+      type="submit"
+      class="btn btn-secondary"
+      {% if can_resend_after_seconds > 0 %}disabled title="انتظر قليلاً"{% endif %}
+    >
+      {% if can_resend_after_seconds > 0 %}
+        إعادة الإرسال بعد {{ can_resend_after_seconds }} ث
+      {% else %}
+        إعادة إرسال الرمز
+      {% endif %}
+    </button>
+  </form>
+  <p class="muted small" style="margin-top:1rem;">
+    <a href="{% url 'signup' %}">العودة إلى التسجيل</a>
+    ·
+    <a href="{% url 'home' %}">الرئيسية</a>
+  </p>
+</div>
+{% endblock %}

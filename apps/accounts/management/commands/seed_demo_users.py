@@ -3,6 +3,7 @@ from datetime import date
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 from django.db import transaction
+from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.profiles.constants import EGYPT_GOVERNORATES
@@ -69,6 +70,8 @@ class Command(BaseCommand):
                 user.applicant_gender = gender
                 user.is_staff = False
                 user.is_superuser = False
+                user.is_active = True
+                user.email_verified_at = timezone.now()
                 user.save()
 
                 profile, _p_created = ApplicantProfile.objects.update_or_create(

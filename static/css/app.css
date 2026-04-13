@@ -156,6 +156,20 @@ ul.errorlist { list-style: none; padding: 0; margin: 0.35rem 0 0.6rem; color: #b
 ul.errorlist li { background: #ffebee; padding: 0.4rem 0.55rem; margin: 0.2rem 0; border-radius: 6px; }
 
 .muted { color: var(--text-muted); font-size: 0.92rem; }
+.muted.small { font-size: 0.85rem; }
+
+.verify-email-card { max-width: 420px; margin-inline: auto; }
+.masked-email { font-weight: 600; color: var(--text); }
+input.otp-input {
+  font-size: 1.35rem;
+  letter-spacing: 0.35em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  max-width: 11rem;
+  padding-inline: 0.75rem;
+}
+.soft-hr { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+button.btn-secondary:disabled { opacity: 0.55; cursor: not-allowed; }
 
 /* ——— تصفح (شبكة بطاقات) ——— */
 .browse-shell { max-width: 720px; margin: 0 auto; }

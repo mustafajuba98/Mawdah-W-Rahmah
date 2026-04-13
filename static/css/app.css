@@ -88,6 +88,11 @@ body {
 }
 .topbar a { color: var(--primary); text-decoration: none; margin-right: 1rem; font-weight: 500; }
 .topbar a:hover { text-decoration: underline; }
+.topbar-guest-nav a { margin-right: 0.55rem; font-size: 0.88rem; }
+@media (max-width: 640px) {
+  .topbar { flex-wrap: wrap; gap: 0.35rem; }
+  .topbar-guest-nav { width: 100%; text-align: left; }
+}
 
 main.page-main {
   flex: 1;
@@ -640,3 +645,234 @@ table.data-table tbody tr:hover { background: #fafcfb; }
 }
 .console-form ul li { margin: 0.35rem 0; }
 .console-form ul li label { display: inline; font-weight: 500; margin-right: 0.35rem; }
+
+/* ——— Landing (guest home) ——— */
+main.page-main.landing-main {
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+.landing {
+  --landing-max: 920px;
+  color: var(--text);
+}
+.landing-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, #1a4033 0%, #2a5c47 42%, #234a3a 100%);
+  color: #e8f4ee;
+  padding: 2.5rem 1.25rem 3rem;
+  text-align: center;
+}
+.landing-hero-inner {
+  max-width: var(--landing-max);
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+.landing-kicker {
+  margin: 0 0 0.5rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.landing-hero h1 {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.85rem, 4.5vw, 2.45rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.landing-lead {
+  margin: 0 auto 1.35rem;
+  max-width: 34rem;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  opacity: 0.94;
+}
+.landing-hero-actions { margin-top: 0.25rem; }
+.landing-hero-actions .btn {
+  margin-top: 0.5rem;
+  margin-left: 0.45rem;
+  margin-right: 0.45rem;
+}
+.btn-hero {
+  background: #fff;
+  color: #1a4033 !important;
+  box-shadow: var(--shadow-md);
+}
+.btn-hero:hover { background: #f0faf4; }
+.btn-hero-outline {
+  background: transparent;
+  color: #fff !important;
+  border: 2px solid rgba(255,255,255,.55);
+}
+.btn-hero-outline:hover { background: rgba(255,255,255,.1); }
+.landing-hero-note { margin: 1.5rem 0 0; opacity: 0.75; }
+.landing-hero-art {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.12;
+}
+.landing-moon {
+  position: absolute;
+  left: 8%;
+  top: 18%;
+  font-size: clamp(4rem, 18vw, 9rem);
+  line-height: 1;
+}
+.landing-stars {
+  position: absolute;
+  right: 10%;
+  bottom: 22%;
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  letter-spacing: 0.5em;
+  white-space: nowrap;
+}
+.landing-section {
+  padding: 2.25rem 1.15rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-page);
+}
+.landing-section:nth-child(even) { background: var(--bg-elevated); }
+.landing-section-inner {
+  max-width: var(--landing-max);
+  margin: 0 auto;
+}
+.landing-section h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+.landing-ico { font-size: 1.25rem; line-height: 1; }
+.section-intro { margin: 0 0 1.25rem; max-width: 40rem; }
+.landing-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+.landing-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.15rem 1.2rem;
+  box-shadow: var(--shadow-sm);
+}
+.landing-card h3 { margin: 0 0 0.4rem; font-size: 1.05rem; color: var(--primary); }
+.landing-social-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+.landing-social-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius);
+  padding: 1.35rem 1.4rem;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.landing-social-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(30, 40, 34, 0.12);
+}
+.landing-social-wa {
+  background: linear-gradient(135deg, #e8f5e9 0%, #fff 100%);
+  border-color: #b8d9c0;
+}
+.landing-social-fb {
+  background: linear-gradient(135deg, #e3f2fd 0%, #fff 100%);
+  border-color: #b3c9e8;
+}
+.landing-social-card h3 { margin: 0.35rem 0 0.4rem; font-size: 1.15rem; }
+.landing-social-card p { margin: 0; font-size: 0.92rem; color: var(--text-muted); }
+.landing-social-icon { font-size: 1.75rem; display: block; }
+.landing-social-cta {
+  display: inline-block;
+  margin-top: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.9rem;
+}
+.landing-prayer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+.hijri-chip {
+  background: var(--primary-soft);
+  color: var(--primary);
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.landing-prayer-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.65rem;
+}
+.landing-prayer-list li {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: center;
+}
+.landing-prayer-list .prayer-name { font-weight: 700; color: var(--primary); }
+.landing-prayer-list .prayer-time {
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+.landing-fallback { max-width: 32rem; }
+.landing-dhikr-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+.landing-dhikr-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.35rem 1rem 0.85rem;
+  box-shadow: var(--shadow-sm);
+}
+.landing-dhikr-card summary {
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.65rem 0;
+  color: var(--primary);
+  list-style: none;
+}
+.landing-dhikr-card summary::-webkit-details-marker { display: none; }
+.landing-dhikr-card ul {
+  margin: 0;
+  padding: 0 1rem 0.5rem 0;
+  font-size: 0.93rem;
+  color: var(--text-muted);
+}
+.landing-dhikr-card li { margin: 0.5rem 0; line-height: 1.55; }
+.landing-dhikr-card em { color: var(--text); font-style: normal; font-weight: 600; }
+.landing-footer {
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--primary-soft) 100%);
+  border-bottom: none;
+  text-align: center;
+  padding: 2.5rem 1.15rem 3rem;
+}
+.landing-footer-inner h2 { margin: 0 0 0.5rem; justify-content: center; }
+.landing-footer .btn { margin-top: 0.75rem; }

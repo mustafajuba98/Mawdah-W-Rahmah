@@ -41,13 +41,17 @@
         <span>{{ user.email }}</span>
       {% else %}
         <strong><a href="{% url 'home' %}">مودة ورحمة</a></strong>
-        <span>
+        <span class="topbar-guest-nav">
+          <a href="{% url 'home' %}#about">عن المنصة</a>
+          <a href="{% url 'home' %}#community">المجتمع</a>
+          <a href="{% url 'home' %}#prayer">الصلاة</a>
+          <a href="{% url 'home' %}#adhkar">الأذكار</a>
           <a href="{% url 'login' %}">دخول</a>
           <a href="{% url 'signup' %}">تسجيل</a>
         </span>
       {% endif %}
     </div>
-    <main class="page-main">
+    <main class="page-main {% block main_class %}{% endblock %}">
       {% if messages %}
         <ul class="messages">
           {% for m in messages %}

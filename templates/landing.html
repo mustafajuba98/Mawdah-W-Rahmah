@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}مودة ورحمة — للتعارف الشرعي{% endblock %}
+{% block main_class %}landing-main{% endblock %}
+{% block content %}
+<div class="landing">
+  <header class="landing-hero">
+    <div class="landing-hero-inner">
+      <p class="landing-kicker">بإشراف فريق · تعارف شرعي</p>
+      <h1>مودة ورحمة</h1>
+      <p class="landing-lead">
+        منصة هادئة للتعارف بقصد الزواج، بضوابط شرعية وخصوصية للبيانات الحساسة.
+        نسأل الله التوفيق والبركة في الخطوة.
+      </p>
+      <div class="landing-hero-actions">
+        <a class="btn btn-hero" href="{% url 'signup' %}">إنشاء حساب</a>
+        <a class="btn btn-hero-outline" href="{% url 'login' %}">تسجيل الدخول</a>
+      </div>
+      <p class="landing-hero-note muted small">ولا تنسَ ذكر الله ومواقيت الصلاة أسفل الصفحة</p>
+    </div>
+    <div class="landing-hero-art" aria-hidden="true">
+      <span class="landing-moon">☽</span>
+      <span class="landing-stars">✦ ✦ ✦</span>
+    </div>
+  </header>
+
+  <section class="landing-section landing-values" id="about">
+    <div class="landing-section-inner">
+      <h2><span class="landing-ico" aria-hidden="true">🤲</span> قيمنا</h2>
+      <div class="landing-grid-3">
+        <article class="landing-card">
+          <h3>الشرع أولاً</h3>
+          <p class="muted">مسار واضح للتعارف والموافقات بما يرضي الله.</p>
+        </article>
+        <article class="landing-card">
+          <h3>الخصوصية</h3>
+          <p class="muted">لا تُعرض البيانات الحساسة إلا بعد الموافقات المحددة.</p>
+        </article>
+        <article class="landing-card">
+          <h3>الهدوء</h3>
+          <p class="muted">تجربة بسيطة بعيداً عن الإزعاج والتشتيت.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-section landing-community" id="community">
+    <div class="landing-section-inner">
+      <h2><span class="landing-ico" aria-hidden="true">🕌</span> مجتمعنا</h2>
+      <p class="section-intro muted">انضم للمجموعات الرسمية للأخبار والتذكير والدعم.</p>
+      <div class="landing-social-grid">
+        <a class="landing-social-card landing-social-wa" href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer">
+          <span class="landing-social-icon" aria-hidden="true">💬</span>
+          <h3>واتساب</h3>
+          <p>مجموعة «مودة ورحمة للزواج» — اضغط للانضمام</p>
+          <span class="landing-social-cta">فتح الدعوة ←</span>
+        </a>
+        <a class="landing-social-card landing-social-fb" href="{{ facebook_url }}" target="_blank" rel="noopener noreferrer">
+          <span class="landing-social-icon" aria-hidden="true">📘</span>
+          <h3>فيسبوك</h3>
+          <p>مجموعة فيسبوك الرسمية للمتابعة والنقاش المفيد</p>
+          <span class="landing-social-cta">فتح المجموعة ←</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-section landing-prayer" id="prayer">
+    <div class="landing-section-inner">
+      <h2><span class="landing-ico" aria-hidden="true">🕋</span> مواقيت الصلاة</h2>
+      <p class="section-intro muted">اليوم — القاهرة، مصر (تقريب حسب الهيئة المصرية). المصدر: خدمة عامة للمواقيت.</p>
+      {% if prayer and prayer.rows %}
+      <div class="landing-prayer-meta muted small">
+        {% if prayer.gregorian %}<span>{{ prayer.gregorian }}</span>{% endif %}
+        {% if prayer.hijri %}<span class="hijri-chip">{{ prayer.hijri }} هـ</span>{% endif %}
+      </div>
+      <ul class="landing-prayer-list">
+        {% for row in prayer.rows %}
+        <li>
+          <span class="prayer-name">{{ row.label }}</span>
+          <span class="prayer-time" dir="ltr">{{ row.time }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="landing-fallback muted">تعذّر تحميل المواقيت حالياً. يمكنك الاعتماد على تطبيق المواقيت أو المسجد القريب.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="landing-section landing-dhikr" id="adhkar">
+    <div class="landing-section-inner">
+      <h2><span class="landing-ico" aria-hidden="true">📿</span> أذكار مختصرة</h2>
+      <p class="section-intro muted">من السنة — ردّد بوقار ومعرفة بالمعنى قدر استطاعتك.</p>
+      <div class="landing-dhikr-grid">
+        <details class="landing-dhikr-card" open>
+          <summary>بعد الصلوات</summary>
+          <ul>
+            <li><strong>سبحان الله</strong> × ٣٣، <strong>الحمد لله</strong> × ٣٣، <strong>الله أكبر</strong> × ٣٣.</li>
+            <li>قول: <em>لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير</em> — بعد صلاة المغرب والفجر خصوصاً.</li>
+          </ul>
+        </details>
+        <details class="landing-dhikr-card">
+          <summary>صباحاً ومساءً</summary>
+          <ul>
+            <li>قراءة سورتي <strong>الإخلاص والفلق والناس</strong> ثلاث مرات بعد صلاة الفجر والمغرب.</li>
+            <li><em>أصبحنا وأصبح الملك لله…</em> و <em>أمسينا وأمسى الملك لله…</em> (من الأذكار المعروفة في الكتب المعتمدة).</li>
+          </ul>
+        </details>
+        <details class="landing-dhikr-card">
+          <summary>عند النوم</summary>
+          <ul>
+            <li>قراءة آية الكرسي، وآخر سورتين، وضرب الكف على الفراش ثلاثاً ونحوها مما ثبت في الصحيح.</li>
+            <li><em>باسمك اللهم أموت وأحيا</em>.</li>
+          </ul>
+        </details>
+        <details class="landing-dhikr-card">
+          <summary>عام</summary>
+          <ul>
+            <li><em>سبحان الله وبحمده</em> — قيل: حُطَّت خطاياه وإن كانت مثل زبد البحر.</li>
+            <li><em>لا حول ولا قوة إلا بالله</em> — كنز من كنوز الجنة.</li>
+          </ul>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <footer class="landing-footer" id="join">
+    <div class="landing-section-inner landing-footer-inner">
+      <h2>ابدأ بخطوة مباركة</h2>
+      <p class="muted">أنشئ حساباً و أكمل التحقق من البريد ثم الاستمارة.</p>
+      <a class="btn btn-hero" href="{% url 'signup' %}">تسجيل</a>
+    </div>
+  </footer>
+</div>
+{% endblock %}
